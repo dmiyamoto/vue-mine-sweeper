@@ -50,15 +50,19 @@
             即座に負けとなりますので、ご注意ください。</p>
         </div>
       </div>
-      <div id="board">
+      <div
+        v-show="init_flg"
+        id="board"
+      >
         <div
           v-for="i in 10"
           :key="i"
+          :class="'row'"
         >
           <div
             v-for="t in 10"
             :key="t"
-            :class="'square x' + t + ' ' + 'y' + i"
+            :class="'col x' + t + ' ' + 'y' + i"
           />
         </div>
       </div>
@@ -122,18 +126,15 @@ export default {
         // サーバーからの応答内容を処理
         xhr.onreadystatechange = () => {
           if (xhr.readyState === 4 && xhr.status === 200) {
-            var msg = JSON.parse(xhr.responseText)
-            if (msg !== 'その部屋は他のプレーヤーが対戦中です。') {
-              init()
-              play_flg = true
-              restart_flg = true
-            } else {
-              alert(msg)
-            }
+            JSON.parse(xhr.responseText) !==
+            'その部屋は他のプレーヤーが対戦中です。'
+              ? (this.init_flg = true)((this.play_flg = true))(
+                  (this.restart_flg = true)
+                )
+              : alert(JSON.parse(xhr.responseText))
           }
         }
       } else {
-        // init()
         var player = document.getElementById('name_input').value // プレーヤー名を取得
         var id = 'id' + Math.floor(Math.random() * 1111111) + player // 当ユーザー用識別ID生成
         localStorage.setItem('msweep', id) //ローカルストレージに当ユーザー用識別ID格納
@@ -172,11 +173,16 @@ export default {
 #board {
   width: 500px;
   height: 500px;
+  margin: 20px;
 }
 
-.suaure {
-  width: 50px;
-  height: 50px;
+.row {
+  display: flex;
+}
+
+.col {
+  width: 48px;
+  height: 48px;
   border: 1px solid black;
   background-color: darkgrey;
 }
@@ -188,11 +194,11 @@ export default {
 }
 
 #play {
-  text-align: center;
+  margin-top: 20px;
 }
 
 #msg {
-  width: 320px;
+  width: 326px;
   height: 220px;
   vertical-align: top;
   margin-right: 30px;
@@ -200,12 +206,12 @@ export default {
 }
 
 #wrapper {
-  width: 325px;
+  width: 330px;
 }
 
 #explanation {
   border: 1px outset black;
-  width: 325px;
+  width: 326px;
   font-size: 12px;
 }
 
