@@ -11,6 +11,8 @@ app.set('port', port)
 let config = require('../nuxt.config.js')
 config.dev = !(process.env.NODE_ENV === 'production')
 
+app.use('/assets',express.static(__dirname + '/assets'))
+
 async function start() {
   // Init Nuxt.js
   const nuxt = new Nuxt(config)
@@ -336,7 +338,6 @@ app.get('/prepare', function(req, res) {
           roomName: room['optxt']
         }
         roomA.push(detail)
-        console.log(roomA)
       } else {
         flag_room = true
       }
@@ -407,7 +408,7 @@ app.get('/play', function(req, res) {
     state['player']['oneID'] = roomA[0]['id']
     state['player']['twoID'] = roomA[1]['id']
     state['player']['roomName'] = roomA[0]['roomName']
-    msg = '試合が開始しましたので、よろしくお願いします。'
+    msg = ''
   } else if (play_flg) {
     msg = '既に試合中です。'
   } else {
@@ -549,23 +550,10 @@ app.get('/set', function(req, res) {
       data['id'] === state['player']['twoID'])
   ) {
     // y座標を取得
-    y = data['y']
-    for (var i = 0; i < ROWS; i++) {
-      y = y - 50
-      if (y < 0) {
-        calcY = i
-        break
-      }
-    }
+    calcY = data['y'] - 1
+
     // x座標を取得
-    x = data['x']
-    for (var s = 0; s < COLS; s++) {
-      x = x - 50
-      if (x < 0) {
-        calcX = s
-        break
-      }
-    }
+    calcX = data['x'] - 1
 
     // 対象座標の箇所を判定・処理
     if (
@@ -789,7 +777,7 @@ app.get('/set', function(req, res) {
       '試合は終了しました。\n再試合を希望される場合は「再戦する」、当ゲームを終了する場合は「退出する」ボタンを押してください。'
   }
   res.set('Access-Control-Allow-Origin', process.env.ALLOW_ORIGIN)
-  res.json({ msg: msg, flg: final_flg })
+  res.json({ msg: msg, flg: final_flg, id: data['id'] })
 })
 
 app.get('/draw', function(req, res) {
