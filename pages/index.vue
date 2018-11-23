@@ -142,7 +142,10 @@ export default {
                     var y = document.getElementById('y=' + q)
                     var x = document.getElementById('y=' + q).childNodes[t]
                     if (state_info[q - 1][t]['opened'] === false) {
-                      x.childElementCount !== 0 ? (x.innerHTML = '') : ''
+                      if (x.classList.length === 2) {
+                        x.classList.remove('splite_flg') //フラグを削除するため画像を削除
+                        x.style.backgroundColor = 'darkgrey' //マスを閉じた状態に戻す描画
+                      }
                     } else if (
                       state_info[q - 1][t]['opened'] &&
                       state_info[q - 1][t]['hasFlag'] === false
