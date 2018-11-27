@@ -107,23 +107,24 @@ export default {
     }
   },
   mounted() {
-    //*******************変数宣言領域***********************
-    var play_flg = false //試合中か否かの判定フラグ
-    var restart_flg = false //再入室したか否かの判定フラグ
-    var final_flg = false //試合終了したか否かの判定フラグ
-    var next_flg = false //再戦希望か否かの判定フラグ
-    var msg_roomA = [] //メッセージ管理用
+    //*******************変数宣言領域***********************************
+    let play_flg = false //試合中か否かの判定フラグ
+    let restart_flg = false //再入室したか否かの判定フラグ
+    let final_flg = false //試合終了したか否かの判定フラグ
+    let next_flg = false //再戦希望か否かの判定フラグ
+    let msg_roomA = [] //メッセージ管理用
     const COLS = 10 //横10マス
     const ROWS = 10 //縦10マス
-    //******************************************************
+    const xhr = new XMLHttpRequest() //サーバ通信リクエスト用オブジェクト
+    let tmpResponse //サーバ通信レスポンス結果格納用変数
+    let url //サーバ通信リクエスト用変数
+    let param //サーバ通信リクエストパラメーター用変数
+    //****************************************************************
     // ポーリング処理
     this.intervalId = setInterval(function() {
       if (play_flg) {
         if (final_flg === false) {
-          var tmpResponse
-          var state_info
-          var xhr = new XMLHttpRequest()
-          var url = '/draw/'
+          url = '/draw/'
           xhr.open('GET', url, true)
           xhr.send()
 
@@ -132,15 +133,15 @@ export default {
             if (xhr.readyState === 4 && xhr.status === 200) {
               tmpResponse = JSON.parse(xhr.responseText)
               if (tmpResponse['msg'] === '' || restart_flg) {
-                state_info = tmpResponse['map']
+                const state_info = tmpResponse['map']
                 restart_flg = false // 再入室時１回のみの処理
 
                 //y座標の処理ループ
-                for (var q = 1; q <= ROWS; q++) {
+                for (let q = 1; q <= ROWS; q++) {
                   //x座標の処理ループ
-                  for (var t = 0; t < COLS; t++) {
-                    var y = document.getElementById('y=' + q)
-                    var x = document.getElementById('y=' + q).childNodes[t]
+                  for (let t = 0; t < COLS; t++) {
+                    let y = document.getElementById('y=' + q)
+                    let x = document.getElementById('y=' + q).childNodes[t]
                     if (state_info[q - 1][t]['opened'] === false) {
                       if (x.classList.length === 2) {
                         x.classList.remove('splite_flg') //フラグを削除するため画像を削除
@@ -204,15 +205,14 @@ export default {
             }
           }
         } else if (final_flg && next_flg === false) {
-          var xhr = new XMLHttpRequest()
-          var url = '/nextstatus/'
+          url = '/nextstatus/'
           xhr.open('GET', url, true)
           xhr.send()
 
           // サーバーからの応答内容を処理
           xhr.onreadystatechange = () => {
             if (xhr.readyState === 4 && xhr.status === 200) {
-              var nextFlg = JSON.parse(xhr.responseText)
+              const nextFlg = JSON.parse(xhr.responseText)
               if (nextFlg['flg']) {
                 // 確認ダイアログの表示
                 if (
@@ -221,15 +221,14 @@ export default {
                   )
                 ) {
                   // OKボタン押下時の処理
-                  var xhr = new XMLHttpRequest()
-                  var url = '/nextstart/'
+                  url = '/nextstart/'
                   xhr.open('GET', url, true)
                   xhr.send()
 
                   // サーバーからの応答内容を処理
                   xhr.onreadystatechange = () => {
                     if (xhr.readyState === 4 && xhr.status === 200) {
-                      var tmp = JSON.parse(xhr.responseText)
+                      const tmp = JSON.parse(xhr.responseText)
                       // init(); //初期化処理を実施する
                       final_flg = false
                       document.getElementById(
@@ -242,8 +241,7 @@ export default {
                   }
                 } else {
                   // キャンセルボタン押下時の処理
-                  var xhr = new XMLHttpRequest()
-                  var param = 'id=' + localStorage.getItem('msweep')
+                  param = 'id=' + localStorage.getItem('msweep')
                   url = '/exit/?' + param
                   xhr.open('GET', url, true)
                   xhr.send()
@@ -260,15 +258,14 @@ export default {
             }
           }
         } else if (final_flg && next_flg) {
-          var xhr = new XMLHttpRequest()
-          var url = '/nextwait/'
+          url = '/nextwait/'
           xhr.open('GET', url, true)
           xhr.send()
 
           // サーバーからの応答内容を処理
           xhr.onreadystatechange = () => {
             if (xhr.readyState === 4 && xhr.status === 200) {
-              var reply = JSON.parse(xhr.responseText)
+              let reply = JSON.parse(xhr.responseText)
               switch (reply['flg']) {
                 case 'exit':
                   alert(reply['msg'])
@@ -289,18 +286,16 @@ export default {
         }
       } else {
         // 対戦相手が試合開始しているか否か判定
-        var tmpResponse
         if (localStorage.getItem('msweep') !== null) {
-          var xhr = new XMLHttpRequest()
-          var param = 'id=' + localStorage.getItem('msweep')
-          var url = '/status/?' + param
+          param = 'id=' + localStorage.getItem('msweep')
+          url = '/status/?' + param
           xhr.open('GET', url, true)
           xhr.send()
 
           // サーバーからの応答内容を処理
           xhr.onreadystatechange = () => {
             if (xhr.readyState === 4 && xhr.status === 200) {
-              var tmpResponse = JSON.parse(xhr.responseText)
+              tmpResponse = JSON.parse(xhr.responseText)
               tmpResponse['flg']
                 ? (play_flg = tmpResponse['flg']) //試合開始する
                 : ''
@@ -308,21 +303,21 @@ export default {
                 alert(tmpResponse['msg'])
               } else {
                 if (tmpResponse['msg'].length > 0 && msg_roomA.length < 2) {
-                  for (var t = 0; t < tmpResponse['msg'].length; t++) {
+                  for (let t = 0; t < tmpResponse['msg'].length; t++) {
                     if (msg_roomA.length !== 0) {
                       msg_roomA[0] !== tmpResponse['msg'][t]
                         ? msg_roomA.push(tmpResponse['msg'][t])
                         : ''
                       if (msg_roomA[0] !== tmpResponse['msg'][t]) {
-                        var content = msg_roomA[0]
-                        for (var s = 1; s < msg_roomA.length; s++) {
+                        let content = msg_roomA[0]
+                        for (let s = 1; s < msg_roomA.length; s++) {
                           content = content + '\n\n' + msg_roomA[s]
                         }
                         document.getElementById('msg').value = content
                       }
                     } else {
                       msg_roomA.push(tmpResponse['msg'][t])
-                      var content = msg_roomA[0]
+                      let content = msg_roomA[0]
                       document.getElementById('msg').value = content
                     }
                   }
@@ -340,17 +335,20 @@ export default {
   },
   methods: {
     start(idname) {
-      var obj = document.getElementById(idname)
-      var idx = obj.selectedIndex
-      var opval = obj.options[idx].value
-      var optxt = obj.options[idx].text
+      const obj = document.getElementById(idname)
+      const idx = obj.selectedIndex
+      const opval = obj.options[idx].value
+      const optxt = obj.options[idx].text
+      const xhr = new XMLHttpRequest()
+      let id
+      let param
+      let url
 
       // 試合途中の再入室か本当に試合を開始するのかを判定
       if (localStorage.getItem('msweep') !== null) {
-        var id = localStorage.getItem('msweep')
-        var param = 'id=' + id + '&opval=' + opval + '&optxt=' + optxt
-        var url = '/restart/?' + param
-        var xhr = new XMLHttpRequest()
+        id = localStorage.getItem('msweep')
+        param = 'id=' + id + '&opval=' + opval + '&optxt=' + optxt
+        url = '/restart/?' + param
         xhr.open('GET', url, true)
         xhr.send()
 
@@ -366,12 +364,12 @@ export default {
           }
         }
       } else {
-        var player = document.getElementById('name_input').value // プレーヤー名を取得
-        var id = 'id' + Math.floor(Math.random() * 1111111) + player // 当ユーザー用識別ID生成
+        let player = document.getElementById('name_input').value // プレーヤー名を取得
+        id = 'id' + Math.floor(Math.random() * 1111111) + player // 当ユーザー用識別ID生成
         localStorage.setItem('msweep', id) //ローカルストレージに当ユーザー用識別ID格納
 
         // ユーザー情報をサーバー側にセット
-        var param =
+        param =
           'id=' +
           id +
           '&player=' +
@@ -380,8 +378,7 @@ export default {
           opval +
           '&optxt=' +
           optxt
-        var url = '/prepare/?' + param
-        var xhr = new XMLHttpRequest()
+        url = '/prepare/?' + param
         xhr.open('GET', url, true)
         xhr.send()
 
@@ -397,20 +394,19 @@ export default {
       }
     },
     set: function(e) {
-      var x = e.currentTarget.id
-      var y = e.currentTarget.parentNode.id
-      var playerID = localStorage.getItem('msweep')
-
-      var xhr = new XMLHttpRequest()
-      var param = 'id=' + playerID + '&' + x + '&' + y + '&flg=' + ''
-      var url = '/set/?' + param
+      const x = e.currentTarget.id
+      const y = e.currentTarget.parentNode.id
+      const playerID = localStorage.getItem('msweep')
+      const param = 'id=' + playerID + '&' + x + '&' + y + '&flg=' + ''
+      const url = '/set/?' + param
+      const xhr = new XMLHttpRequest()
       xhr.open('GET', url, true)
       xhr.send()
 
       // サーバーからの応答内容を処理
       xhr.onreadystatechange = () => {
         if (xhr.readyState === 4 && xhr.status === 200) {
-          var data = JSON.parse(xhr.responseText)
+          const data = JSON.parse(xhr.responseText)
           if (data['flg']) {
             document.getElementById('competition_start').disabled = true // 対戦開始ボタンの操作を不可にする
             document.getElementById('next_play').disabled = false // 再戦するボタンの操作を可能にする
@@ -421,20 +417,19 @@ export default {
       }
     },
     flag: function(e) {
-      var x = e.currentTarget.id
-      var y = e.currentTarget.parentNode.id
-      var playerID = localStorage.getItem('msweep')
-
-      var xhr = new XMLHttpRequest()
-      var param = 'id=' + playerID + '&' + x + '&' + y + '&flg=true'
-      var url = '/set/?' + param
+      const x = e.currentTarget.id
+      const y = e.currentTarget.parentNode.id
+      const playerID = localStorage.getItem('msweep')
+      const param = 'id=' + playerID + '&' + x + '&' + y + '&flg=true'
+      const url = '/set/?' + param
+      const xhr = new XMLHttpRequest()
       xhr.open('GET', url, true)
       xhr.send()
 
       // サーバーからの応答内容を処理
       xhr.onreadystatechange = () => {
         if (xhr.readyState === 4 && xhr.status === 200) {
-          var data = JSON.parse(xhr.responseText)
+          const data = JSON.parse(xhr.responseText)
           if (data['flg']) {
             document.getElementById('competition_start').disabled = true // 対戦開始ボタンの操作を不可にする
             document.getElementById('next_play').disabled = false // 再戦するボタンの操作を可能にする
@@ -445,8 +440,8 @@ export default {
       }
     },
     play: function() {
-      var xhr = new XMLHttpRequest()
-      var url = '/play/'
+      const url = '/play/'
+      const xhr = new XMLHttpRequest()
       xhr.open('GET', url, true)
       xhr.send()
 
@@ -461,9 +456,9 @@ export default {
     },
     exitPlay: function() {
       if (localStorage.getItem('msweep') !== null) {
-        var param = 'id=' + localStorage.getItem
-        var xhr = new XMLHttpRequest()
-        var url = '/exit/?' + param
+        const param = 'id=' + localStorage.getItem
+        const url = '/exit/?' + param
+        const xhr = new XMLHttpRequest()
         xhr.open('GET', url, true)
         xhr.send()
 
@@ -478,11 +473,11 @@ export default {
     },
     nextPlay: function() {
       if (localStorage.getItem('msweep') !== null) {
-        next_flg = true
-        var id = localStorage.getItem('msweep')
-        var param = 'id=' + id
-        var xhr = new XMLHttpRequest()
-        var url = '/nextplay/?' + param
+        let next_flg = true
+        const id = localStorage.getItem('msweep')
+        const param = 'id=' + id
+        const url = '/nextplay/?' + param
+        const xhr = new XMLHttpRequest()
         xhr.open('GET', url, true)
         xhr.send()
 

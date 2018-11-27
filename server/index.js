@@ -36,250 +36,31 @@ async function start() {
 start()
 
 // 初期ステータス一覧
-var init_state = {
+// prettier-ignore
+let init_state = {
   map: [
-    [
-      { opened: false, hasBom: false, numBom: '', hasFlag: false },
-      { opened: false, hasBom: false, numBom: '', hasFlag: false },
-      { opened: false, hasBom: false, numBom: '', hasFlag: false },
-      { opened: false, hasBom: false, numBom: '', hasFlag: false },
-      { opened: false, hasBom: false, numBom: '', hasFlag: false },
-      { opened: false, hasBom: false, numBom: '', hasFlag: false },
-      { opened: false, hasBom: false, numBom: '', hasFlag: false },
-      { opened: false, hasBom: false, numBom: '', hasFlag: false },
-      { opened: false, hasBom: false, numBom: '', hasFlag: false },
-      { opened: false, hasBom: false, numBom: '', hasFlag: false }
-    ],
-    [
-      { opened: false, hasBom: false, numBom: '', hasFlag: false },
-      { opened: false, hasBom: false, numBom: '', hasFlag: false },
-      { opened: false, hasBom: false, numBom: '', hasFlag: false },
-      { opened: false, hasBom: false, numBom: '', hasFlag: false },
-      { opened: false, hasBom: false, numBom: '', hasFlag: false },
-      { opened: false, hasBom: false, numBom: '', hasFlag: false },
-      { opened: false, hasBom: false, numBom: '', hasFlag: false },
-      { opened: false, hasBom: false, numBom: '', hasFlag: false },
-      { opened: false, hasBom: false, numBom: '', hasFlag: false },
-      { opened: false, hasBom: false, numBom: '', hasFlag: false }
-    ],
-    [
-      { opened: false, hasBom: false, numBom: '', hasFlag: false },
-      { opened: false, hasBom: false, numBom: '', hasFlag: false },
-      { opened: false, hasBom: false, numBom: '', hasFlag: false },
-      { opened: false, hasBom: false, numBom: '', hasFlag: false },
-      { opened: false, hasBom: false, numBom: '', hasFlag: false },
-      { opened: false, hasBom: false, numBom: '', hasFlag: false },
-      { opened: false, hasBom: false, numBom: '', hasFlag: false },
-      { opened: false, hasBom: false, numBom: '', hasFlag: false },
-      { opened: false, hasBom: false, numBom: '', hasFlag: false },
-      { opened: false, hasBom: false, numBom: '', hasFlag: false }
-    ],
-    [
-      { opened: false, hasBom: false, numBom: '', hasFlag: false },
-      { opened: false, hasBom: false, numBom: '', hasFlag: false },
-      { opened: false, hasBom: false, numBom: '', hasFlag: false },
-      { opened: false, hasBom: false, numBom: '', hasFlag: false },
-      { opened: false, hasBom: false, numBom: '', hasFlag: false },
-      { opened: false, hasBom: false, numBom: '', hasFlag: false },
-      { opened: false, hasBom: false, numBom: '', hasFlag: false },
-      { opened: false, hasBom: false, numBom: '', hasFlag: false },
-      { opened: false, hasBom: false, numBom: '', hasFlag: false },
-      { opened: false, hasBom: false, numBom: '', hasFlag: false }
-    ],
-    [
-      { opened: false, hasBom: false, numBom: '', hasFlag: false },
-      { opened: false, hasBom: false, numBom: '', hasFlag: false },
-      { opened: false, hasBom: false, numBom: '', hasFlag: false },
-      { opened: false, hasBom: false, numBom: '', hasFlag: false },
-      { opened: false, hasBom: false, numBom: '', hasFlag: false },
-      { opened: false, hasBom: false, numBom: '', hasFlag: false },
-      { opened: false, hasBom: false, numBom: '', hasFlag: false },
-      { opened: false, hasBom: false, numBom: '', hasFlag: false },
-      { opened: false, hasBom: false, numBom: '', hasFlag: false },
-      { opened: false, hasBom: false, numBom: '', hasFlag: false }
-    ],
-    [
-      { opened: false, hasBom: false, numBom: '', hasFlag: false },
-      { opened: false, hasBom: false, numBom: '', hasFlag: false },
-      { opened: false, hasBom: false, numBom: '', hasFlag: false },
-      { opened: false, hasBom: false, numBom: '', hasFlag: false },
-      { opened: false, hasBom: false, numBom: '', hasFlag: false },
-      { opened: false, hasBom: false, numBom: '', hasFlag: false },
-      { opened: false, hasBom: false, numBom: '', hasFlag: false },
-      { opened: false, hasBom: false, numBom: '', hasFlag: false },
-      { opened: false, hasBom: false, numBom: '', hasFlag: false },
-      { opened: false, hasBom: false, numBom: '', hasFlag: false }
-    ],
-    [
-      { opened: false, hasBom: false, numBom: '', hasFlag: false },
-      { opened: false, hasBom: false, numBom: '', hasFlag: false },
-      { opened: false, hasBom: false, numBom: '', hasFlag: false },
-      { opened: false, hasBom: false, numBom: '', hasFlag: false },
-      { opened: false, hasBom: false, numBom: '', hasFlag: false },
-      { opened: false, hasBom: false, numBom: '', hasFlag: false },
-      { opened: false, hasBom: false, numBom: '', hasFlag: false },
-      { opened: false, hasBom: false, numBom: '', hasFlag: false },
-      { opened: false, hasBom: false, numBom: '', hasFlag: false },
-      { opened: false, hasBom: false, numBom: '', hasFlag: false }
-    ],
-    [
-      { opened: false, hasBom: false, numBom: '', hasFlag: false },
-      { opened: false, hasBom: false, numBom: '', hasFlag: false },
-      { opened: false, hasBom: false, numBom: '', hasFlag: false },
-      { opened: false, hasBom: false, numBom: '', hasFlag: false },
-      { opened: false, hasBom: false, numBom: '', hasFlag: false },
-      { opened: false, hasBom: false, numBom: '', hasFlag: false },
-      { opened: false, hasBom: false, numBom: '', hasFlag: false },
-      { opened: false, hasBom: false, numBom: '', hasFlag: false },
-      { opened: false, hasBom: false, numBom: '', hasFlag: false },
-      { opened: false, hasBom: false, numBom: '', hasFlag: false }
-    ],
-    [
-      { opened: false, hasBom: false, numBom: '', hasFlag: false },
-      { opened: false, hasBom: false, numBom: '', hasFlag: false },
-      { opened: false, hasBom: false, numBom: '', hasFlag: false },
-      { opened: false, hasBom: false, numBom: '', hasFlag: false },
-      { opened: false, hasBom: false, numBom: '', hasFlag: false },
-      { opened: false, hasBom: false, numBom: '', hasFlag: false },
-      { opened: false, hasBom: false, numBom: '', hasFlag: false },
-      { opened: false, hasBom: false, numBom: '', hasFlag: false },
-      { opened: false, hasBom: false, numBom: '', hasFlag: false },
-      { opened: false, hasBom: false, numBom: '', hasFlag: false }
-    ],
-    [
-      { opened: false, hasBom: false, numBom: '', hasFlag: false },
-      { opened: false, hasBom: false, numBom: '', hasFlag: false },
-      { opened: false, hasBom: false, numBom: '', hasFlag: false },
-      { opened: false, hasBom: false, numBom: '', hasFlag: false },
-      { opened: false, hasBom: false, numBom: '', hasFlag: false },
-      { opened: false, hasBom: false, numBom: '', hasFlag: false },
-      { opened: false, hasBom: false, numBom: '', hasFlag: false },
-      { opened: false, hasBom: false, numBom: '', hasFlag: false },
-      { opened: false, hasBom: false, numBom: '', hasFlag: false },
-      { opened: false, hasBom: false, numBom: '', hasFlag: false }
-    ]
+    [{opened:false, hasBom:false, numBom:'', hasFlag:false}, {opened:false, hasBom:false, numBom:'', hasFlag:false}, {opened:false, hasBom:false, numBom:'', hasFlag:false}, {opened:false, hasBom:false, numBom:'', hasFlag:false}, {opened:false, hasBom:false, numBom:'', hasFlag:false}, {opened:false, hasBom:false, numBom:'', hasFlag:false}, {opened:false, hasBom:false, numBom:'', hasFlag:false}, {opened:false, hasBom:false, numBom:'', hasFlag:false}, {opened:false, hasBom:false, numBom:'', hasFlag:false}, {opened:false, hasBom:false, numBom:'', hasFlag:false}],
+    [{opened:false, hasBom:false, numBom:'', hasFlag:false}, {opened:false, hasBom:false, numBom:'', hasFlag:false}, {opened:false, hasBom:false, numBom:'', hasFlag:false}, {opened:false, hasBom:false, numBom:'', hasFlag:false}, {opened:false, hasBom:false, numBom:'', hasFlag:false}, {opened:false, hasBom:false, numBom:'', hasFlag:false}, {opened:false, hasBom:false, numBom:'', hasFlag:false}, {opened:false, hasBom:false, numBom:'', hasFlag:false}, {opened:false, hasBom:false, numBom:'', hasFlag:false}, {opened:false, hasBom:false, numBom:'', hasFlag:false}],
+    [{opened:false, hasBom:false, numBom:'', hasFlag:false}, {opened:false, hasBom:false, numBom:'', hasFlag:false}, {opened:false, hasBom:false, numBom:'', hasFlag:false}, {opened:false, hasBom:false, numBom:'', hasFlag:false}, {opened:false, hasBom:false, numBom:'', hasFlag:false}, {opened:false, hasBom:false, numBom:'', hasFlag:false}, {opened:false, hasBom:false, numBom:'', hasFlag:false}, {opened:false, hasBom:false, numBom:'', hasFlag:false}, {opened:false, hasBom:false, numBom:'', hasFlag:false}, {opened:false, hasBom:false, numBom:'', hasFlag:false}],
+    [{opened:false, hasBom:false, numBom:'', hasFlag:false}, {opened:false, hasBom:false, numBom:'', hasFlag:false}, {opened:false, hasBom:false, numBom:'', hasFlag:false}, {opened:false, hasBom:false, numBom:'', hasFlag:false}, {opened:false, hasBom:false, numBom:'', hasFlag:false}, {opened:false, hasBom:false, numBom:'', hasFlag:false}, {opened:false, hasBom:false, numBom:'', hasFlag:false}, {opened:false, hasBom:false, numBom:'', hasFlag:false}, {opened:false, hasBom:false, numBom:'', hasFlag:false}, {opened:false, hasBom:false, numBom:'', hasFlag:false}],
+    [{opened:false, hasBom:false, numBom:'', hasFlag:false}, {opened:false, hasBom:false, numBom:'', hasFlag:false}, {opened:false, hasBom:false, numBom:'', hasFlag:false}, {opened:false, hasBom:false, numBom:'', hasFlag:false}, {opened:false, hasBom:false, numBom:'', hasFlag:false}, {opened:false, hasBom:false, numBom:'', hasFlag:false}, {opened:false, hasBom:false, numBom:'', hasFlag:false}, {opened:false, hasBom:false, numBom:'', hasFlag:false}, {opened:false, hasBom:false, numBom:'', hasFlag:false}, {opened:false, hasBom:false, numBom:'', hasFlag:false}],
+    [{opened:false, hasBom:false, numBom:'', hasFlag:false}, {opened:false, hasBom:false, numBom:'', hasFlag:false}, {opened:false, hasBom:false, numBom:'', hasFlag:false}, {opened:false, hasBom:false, numBom:'', hasFlag:false}, {opened:false, hasBom:false, numBom:'', hasFlag:false}, {opened:false, hasBom:false, numBom:'', hasFlag:false}, {opened:false, hasBom:false, numBom:'', hasFlag:false}, {opened:false, hasBom:false, numBom:'', hasFlag:false}, {opened:false, hasBom:false, numBom:'', hasFlag:false}, {opened:false, hasBom:false, numBom:'', hasFlag:false}],
+    [{opened:false, hasBom:false, numBom:'', hasFlag:false}, {opened:false, hasBom:false, numBom:'', hasFlag:false}, {opened:false, hasBom:false, numBom:'', hasFlag:false}, {opened:false, hasBom:false, numBom:'', hasFlag:false}, {opened:false, hasBom:false, numBom:'', hasFlag:false}, {opened:false, hasBom:false, numBom:'', hasFlag:false}, {opened:false, hasBom:false, numBom:'', hasFlag:false}, {opened:false, hasBom:false, numBom:'', hasFlag:false}, {opened:false, hasBom:false, numBom:'', hasFlag:false}, {opened:false, hasBom:false, numBom:'', hasFlag:false}],
+    [{opened:false, hasBom:false, numBom:'', hasFlag:false}, {opened:false, hasBom:false, numBom:'', hasFlag:false}, {opened:false, hasBom:false, numBom:'', hasFlag:false}, {opened:false, hasBom:false, numBom:'', hasFlag:false}, {opened:false, hasBom:false, numBom:'', hasFlag:false}, {opened:false, hasBom:false, numBom:'', hasFlag:false}, {opened:false, hasBom:false, numBom:'', hasFlag:false}, {opened:false, hasBom:false, numBom:'', hasFlag:false}, {opened:false, hasBom:false, numBom:'', hasFlag:false}, {opened:false, hasBom:false, numBom:'', hasFlag:false}],
+    [{opened:false, hasBom:false, numBom:'', hasFlag:false}, {opened:false, hasBom:false, numBom:'', hasFlag:false}, {opened:false, hasBom:false, numBom:'', hasFlag:false}, {opened:false, hasBom:false, numBom:'', hasFlag:false}, {opened:false, hasBom:false, numBom:'', hasFlag:false}, {opened:false, hasBom:false, numBom:'', hasFlag:false}, {opened:false, hasBom:false, numBom:'', hasFlag:false}, {opened:false, hasBom:false, numBom:'', hasFlag:false}, {opened:false, hasBom:false, numBom:'', hasFlag:false}, {opened:false, hasBom:false, numBom:'', hasFlag:false}],
+    [{opened:false, hasBom:false, numBom:'', hasFlag:false}, {opened:false, hasBom:false, numBom:'', hasFlag:false}, {opened:false, hasBom:false, numBom:'', hasFlag:false}, {opened:false, hasBom:false, numBom:'', hasFlag:false}, {opened:false, hasBom:false, numBom:'', hasFlag:false}, {opened:false, hasBom:false, numBom:'', hasFlag:false}, {opened:false, hasBom:false, numBom:'', hasFlag:false}, {opened:false, hasBom:false, numBom:'', hasFlag:false}, {opened:false, hasBom:false, numBom:'', hasFlag:false}, {opened:false, hasBom:false, numBom:'', hasFlag:false}],
   ],
   client: [
-    [
-      { opened: false },
-      { opened: false },
-      { opened: false },
-      { opened: false },
-      { opened: false },
-      { opened: false },
-      { opened: false },
-      { opened: false },
-      { opened: false },
-      { opened: false }
-    ],
-    [
-      { opened: false },
-      { opened: false },
-      { opened: false },
-      { opened: false },
-      { opened: false },
-      { opened: false },
-      { opened: false },
-      { opened: false },
-      { opened: false },
-      { opened: false }
-    ],
-    [
-      { opened: false },
-      { opened: false },
-      { opened: false },
-      { opened: false },
-      { opened: false },
-      { opened: false },
-      { opened: false },
-      { opened: false },
-      { opened: false },
-      { opened: false }
-    ],
-    [
-      { opened: false },
-      { opened: false },
-      { opened: false },
-      { opened: false },
-      { opened: false },
-      { opened: false },
-      { opened: false },
-      { opened: false },
-      { opened: false },
-      { opened: false }
-    ],
-    [
-      { opened: false },
-      { opened: false },
-      { opened: false },
-      { opened: false },
-      { opened: false },
-      { opened: false },
-      { opened: false },
-      { opened: false },
-      { opened: false },
-      { opened: false }
-    ],
-    [
-      { opened: false },
-      { opened: false },
-      { opened: false },
-      { opened: false },
-      { opened: false },
-      { opened: false },
-      { opened: false },
-      { opened: false },
-      { opened: false },
-      { opened: false }
-    ],
-    [
-      { opened: false },
-      { opened: false },
-      { opened: false },
-      { opened: false },
-      { opened: false },
-      { opened: false },
-      { opened: false },
-      { opened: false },
-      { opened: false },
-      { opened: false }
-    ],
-    [
-      { opened: false },
-      { opened: false },
-      { opened: false },
-      { opened: false },
-      { opened: false },
-      { opened: false },
-      { opened: false },
-      { opened: false },
-      { opened: false },
-      { opened: false }
-    ],
-    [
-      { opened: false },
-      { opened: false },
-      { opened: false },
-      { opened: false },
-      { opened: false },
-      { opened: false },
-      { opened: false },
-      { opened: false },
-      { opened: false },
-      { opened: false }
-    ],
-    [
-      { opened: false },
-      { opened: false },
-      { opened: false },
-      { opened: false },
-      { opened: false },
-      { opened: false },
-      { opened: false },
-      { opened: false },
-      { opened: false },
-      { opened: false }
-    ]
+    [{opened:false},{opened:false},{opened:false},{opened:false},{opened:false},{opened:false},{opened:false},{opened:false},{opened:false},{opened:false}],
+    [{opened:false},{opened:false},{opened:false},{opened:false},{opened:false},{opened:false},{opened:false},{opened:false},{opened:false},{opened:false}],
+    [{opened:false},{opened:false},{opened:false},{opened:false},{opened:false},{opened:false},{opened:false},{opened:false},{opened:false},{opened:false}],
+    [{opened:false},{opened:false},{opened:false},{opened:false},{opened:false},{opened:false},{opened:false},{opened:false},{opened:false},{opened:false}],
+    [{opened:false},{opened:false},{opened:false},{opened:false},{opened:false},{opened:false},{opened:false},{opened:false},{opened:false},{opened:false}],
+    [{opened:false},{opened:false},{opened:false},{opened:false},{opened:false},{opened:false},{opened:false},{opened:false},{opened:false},{opened:false}],
+    [{opened:false},{opened:false},{opened:false},{opened:false},{opened:false},{opened:false},{opened:false},{opened:false},{opened:false},{opened:false}],
+    [{opened:false},{opened:false},{opened:false},{opened:false},{opened:false},{opened:false},{opened:false},{opened:false},{opened:false},{opened:false}],
+    [{opened:false},{opened:false},{opened:false},{opened:false},{opened:false},{opened:false},{opened:false},{opened:false},{opened:false},{opened:false}],
+    [{opened:false},{opened:false},{opened:false},{opened:false},{opened:false},{opened:false},{opened:false},{opened:false},{opened:false},{opened:false}],
   ],
   player: {
     one: '',
@@ -297,19 +78,19 @@ var init_state = {
 const COLS = 10,
   ROWS = 10 // 横10、縦10マス
 
-var state = {} // 試合中の情報
-var play_flg = false //試合中か否かの判定フラグ
-var final_flg = false //試合終了したか否かの判定フラグ
-var next_flg = false //再戦希望か否かの判定フラグ
-var replay_flg = false //再戦を受け入れたか否かの判定フラグ
-var exit_flg = false //対戦相手が退出したか否かの判定フラグ
-var x = 0 //座標取得用変数のCOLS用
-var y = 0 //座標取得用変数のROWS用
+let state = {} // 試合中の情報
+let play_flg = false //試合中か否かの判定フラグ
+let final_flg = false //試合終了したか否かの判定フラグ
+let next_flg = false //再戦希望か否かの判定フラグ
+let replay_flg = false //再戦を受け入れたか否かの判定フラグ
+let exit_flg = false //対戦相手が退出したか否かの判定フラグ
+let x = 0 //座標取得用変数のCOLS用
+let y = 0 //座標取得用変数のROWS用
 
-var calcX
-var calcY
+let calcX
+let calcY
 
-var msg // メッセージ用変数
+let msg // メッセージ用変数
 
 // 開く箇所周囲の爆弾有無チェック用配列
 const directions = [
@@ -324,15 +105,15 @@ const directions = [
 ]
 
 // ルーム管理
-var roomA = []
+let roomA = []
 
 app.get('/prepare', function(req, res) {
-  var room = req.query
-  var flag_room = false
+  const room = req.query
+  let flag_room = false
   switch (room['opval']) {
     case 'roomA':
       if (roomA.length < 2) {
-        var detail = {
+        let detail = {
           id: room['id'],
           player: room['player'],
           roomName: room['optxt']
@@ -351,8 +132,8 @@ app.get('/prepare', function(req, res) {
 })
 
 app.get('/restart', function(req, res) {
-  var room = req.query
-  var reFlag = { flg: false, name: '' }
+  const room = req.query
+  let reFlag = { flg: false, name: '' }
   switch (room['opval']) {
     case 'roomA':
       ;[...Array(roomA.length)].reduce(
@@ -378,8 +159,8 @@ app.get('/play', function(req, res) {
     state = Object.assign({}, init_state)
 
     //オブジェクトを初期化（２周目以降用）
-    for (var k = 0; k < ROWS; k++) {
-      for (var c = 0; c < COLS; c++) {
+    for (let k = 0; k < ROWS; k++) {
+      for (let c = 0; c < COLS; c++) {
         state['map'][k][c]['opened'] = false
         state['map'][k][c]['hasBom'] = false
         state['map'][k][c]['numBom'] = false
@@ -394,7 +175,7 @@ app.get('/play', function(req, res) {
     state['score']['one'] = 0
     state['score']['two'] = 0
 
-    for (var i = 0; i < ROWS; i++) {
+    for (let i = 0; i < ROWS; i++) {
       state['map'][i][Math.floor(Math.random() * 10)] = {
         opened: false,
         hasBom: true,
@@ -432,8 +213,8 @@ app.get('/nextstatus', function(req, res) {
 
 app.get('/nextstart', function(req, res) {
   //初期化
-  for (var k = 0; k < ROWS; k++) {
-    for (var c = 0; c < COLS; c++) {
+  for (let k = 0; k < ROWS; k++) {
+    for (let c = 0; c < COLS; c++) {
       state['map'][k][c]['opened'] = false
       state['map'][k][c]['hasBom'] = false
       state['map'][k][c]['numBom'] = false
@@ -452,7 +233,7 @@ app.get('/nextstart', function(req, res) {
   next_flg = false
   replay_flg = true
 
-  for (var i = 0; i < ROWS; i++) {
+  for (let i = 0; i < ROWS; i++) {
     state['map'][i][Math.floor(Math.random() * 10)] = {
       opened: false,
       hasBom: true,
@@ -468,10 +249,10 @@ app.get('/nextstart', function(req, res) {
 })
 
 app.get('/exit', function(req, res) {
-  var exitData = req.query
+  const exitData = req.query
 
-  for (var k = 0; k < ROWS; k++) {
-    for (var c = 0; c < COLS; c++) {
+  for (let k = 0; k < ROWS; k++) {
+    for (let c = 0; c < COLS; c++) {
       state['map'][k][c]['opened'] = false
       state['map'][k][c]['hasBom'] = false
       state['map'][k][c]['numBom'] = false
@@ -498,7 +279,7 @@ app.get('/exit', function(req, res) {
   next_flg = false
   exit_flg = true
 
-  for (var s = 0; s < roomA.length; s++) {
+  for (let s = 0; s < roomA.length; s++) {
     roomA[s]['id'] === exitData['id'] ? roomA.splice(s, 1) : ''
   }
 
@@ -528,8 +309,8 @@ app.get('/nextwait', function(req, res) {
 })
 
 app.get('/status', function(req, res) {
-  var data = []
-  for (var a = 0; a < roomA.length; a++) {
+  let data = []
+  for (let a = 0; a < roomA.length; a++) {
     data.push(
       roomA[a]['player'] + 'が、' + roomA[a]['roomName'] + 'に入室しました'
     )
@@ -541,7 +322,7 @@ app.get('/status', function(req, res) {
 })
 
 app.get('/set', function(req, res) {
-  var data = req.query
+  const data = req.query
   // 試合中かつ対象のプレイヤーなら、操作を可能とする
   if (
     play_flg &&
@@ -561,10 +342,10 @@ app.get('/set', function(req, res) {
       state['map'][calcY][calcX]['hasBom'] === false
     ) {
       // 所定の箇所を開き、その周囲に爆弾が無いかチェックしてオープンする。
-      var counter = 0
-      for (var h = 0; h < directions.length; h++) {
-        var tmp2X = calcX - directions[h][0]
-        var tmp2Y = calcY - directions[h][1]
+      let counter = 0
+      for (let h = 0; h < directions.length; h++) {
+        let tmp2X = calcX - directions[h][0]
+        let tmp2Y = calcY - directions[h][1]
         if (
           tmp2X >= 0 &&
           tmp2X < COLS &&
@@ -781,7 +562,7 @@ app.get('/set', function(req, res) {
 })
 
 app.get('/draw', function(req, res) {
-  var cnt = 0
+  let cnt = 0
   // 爆弾が埋まっている数＋現在開いているマスの数を計測
   play_flg
     ? [...Array(ROWS)].reduce(
@@ -806,7 +587,7 @@ app.get('/draw', function(req, res) {
     })
   } else {
     final_flg = true
-    var part =
+    const part =
       '  ' +
       state['player']['one'] +
       'さん：' +
@@ -828,9 +609,9 @@ app.get('/draw', function(req, res) {
 
 // 所定の箇所の周囲を判定し、開いていく関数
 function judge(calcX, calcY, playerID) {
-  for (var p = 0; p < directions.length; p++) {
-    var tmpX = calcX - directions[p][0]
-    var tmpY = calcY - directions[p][1]
+  for (let p = 0; p < directions.length; p++) {
+    let tmpX = calcX - directions[p][0]
+    let tmpY = calcY - directions[p][1]
     if (
       tmpX >= 0 &&
       tmpX < COLS &&
@@ -839,10 +620,10 @@ function judge(calcX, calcY, playerID) {
       state['map'][tmpY][tmpX]['opened'] === false &&
       state['map'][tmpY][tmpX]['hasBom'] === false
     ) {
-      var counter = 0
-      for (var g = 0; g < directions.length; g++) {
-        var tmp2X = tmpX - directions[g][0]
-        var tmp2Y = tmpY - directions[g][1]
+      let counter = 0
+      for (let g = 0; g < directions.length; g++) {
+        let tmp2X = tmpX - directions[g][0]
+        let tmp2Y = tmpY - directions[g][1]
         if (tmp2X >= 0 && tmp2X < COLS && tmp2Y >= 0 && tmp2Y < ROWS) {
           state['map'][tmp2Y][tmp2X]['hasBom']
             ? (counter = counter + 1)
