@@ -11,7 +11,7 @@ app.set('port', port)
 let config = require('../nuxt.config.js')
 config.dev = !(process.env.NODE_ENV === 'production')
 
-app.use('/assets',express.static(__dirname + '/assets'))
+app.use('/assets', express.static(__dirname + '/assets'))
 
 async function start() {
   // Init Nuxt.js
@@ -68,6 +68,9 @@ let init_state = {
     oneID: '',
     twoID: '',
     roomName: ''
+  },
+  explosion: {
+    player: ''
   },
   score: {
     one: 0,
@@ -539,16 +542,11 @@ app.get('/set', function(req, res) {
         state['score']['two'] = state['score']['two'] + 1
         msg = ''
       } else {
-        final_flg = true
         state['player']['oneID'] === data['id']
-          ? (msg =
-              '爆弾に引っかかったので、' +
-              state['player']['one'] +
-              'さんの負けになります。')
-          : (msg =
-              '爆弾に引っかかったので、' +
-              state['player']['two'] +
-              'さんの負けになります。')
+          ? (state['explosion']['player'] = state['player']['oneID'])
+          : (state['explosion']['player'] = state['player']['twoID'])
+        final_flg = true
+        msg = ''
       }
     }
   } else if (play_flg === false && final_flg === false) {
@@ -562,6 +560,7 @@ app.get('/set', function(req, res) {
 })
 
 app.get('/draw', function(req, res) {
+  const data = req.query
   let cnt = 0
   // 爆弾が埋まっている数＋現在開いているマスの数を計測
   play_flg
@@ -581,8 +580,19 @@ app.get('/draw', function(req, res) {
   if (cnt !== COLS * ROWS && final_flg === false) {
     res.json({ msg: '', map: state['client'] })
   } else if (cnt !== COLS * ROWS && final_flg) {
+    state['explosion']['player'] === data['id']
+      ? state['player']['oneID'] === data['id']
+        ? (msg =
+            '爆弾に引っかかったので、' +
+            state['player']['one'] +
+            'さんの負けになります。')
+        : (msg =
+            '爆弾に引っかかったので、' +
+            state['player']['two'] +
+            'さんの負けになります。')
+      : (msg = '対戦相手が爆弾に引っかかったので、あなたの勝利です。')
     res.json({
-      msg: '対戦相手が爆弾に引っかかったので、あなたの勝利です。',
+      msg: msg,
       map: state['client']
     })
   } else {

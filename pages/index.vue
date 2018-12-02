@@ -79,26 +79,20 @@
           @click="play"
         >対戦開始
         </button>
-        <button
-          id="next_play"
-          disabled
-          @click="nextPlay"
-        >再戦する
-        </button>
-        <button
-          id="exit_play"
-          disabled
-          @click="exitPlay"
-        >退出する
-        </button>
       </div>
     </div>
+    <!-- モーダルウィンドウ -->
+    <div id="modal-content">
+      <!-- モーダルウィンドウのコンテンツ開始 -->
+      <div id="modal-content-innar"/>
+      <!-- モーダルウィンドウのコンテンツ終了 -->
+    </div>
+    <div id="target_bg"/>
+    <!-- モーダルウィンドウ -->
   </section>
 </template>
 
 <script>
-import axios from 'axios'
-
 export default {
   data() {
     return {
@@ -124,7 +118,9 @@ export default {
     this.intervalId = setInterval(function() {
       if (play_flg) {
         if (final_flg === false) {
-          url = '/draw/'
+          const playerID = localStorage.getItem('msweep')
+          param = 'id=' + playerID
+          url = '/draw/?' + param
           xhr.open('GET', url, true)
           xhr.send()
 
@@ -196,10 +192,32 @@ export default {
                 // 試合終了のメッセージ表示
                 if (final_flg === false) {
                   final_flg = true //試合終了フラグをONにする
+                  const target = document.getElementById('target_bg')
+                  target.innerHTML = "<div id='modal-bg'></div>"
+                  const modal_bg = document.getElementById('modal-bg')
+                  const modal_content = document.getElementById('modal-content')
+                  const modal_content_innar = document.getElementById(
+                    'modal-content-innar'
+                  )
+                  const w = window.innerWidth
+                  const h = window.innerHeight
+                  const cw = modal_content_innar.getBoundingClientRect().width
+                  const ch = modal_content_innar.getBoundingClientRect().height
+
+                  //取得した値をcssに追加する
+                  modal_content.style.left = (w - cw) / 3 + 'px'
+                  modal_content.style.top = +((h - ch) / 3) + 'px'
+
+                  modal_content.style.display = 'block'
+                  modal_bg.style.display = 'block'
+
+                  modal_content_innar.innerHTML =
+                    '<p>' +
+                    tmpResponse['msg'] +
+                    '</p>' +
+                    "<button id='next_play' onclick='nextPlay()' >再戦する</button>" +
+                    "<button id='exit_play' onclick='exitPlay()' >退出する</button>"
                   document.getElementById('competition_start').disabled = true // 対戦開始ボタンの操作を不可にする
-                  document.getElementById('next_play').disabled = false // 再戦するボタンの操作を可能にする
-                  document.getElementById('exit_play').disabled = false // 退出するボタンの操作を可能にする
-                  alert(tmpResponse['msg'])
                 }
               }
             }
@@ -409,8 +427,6 @@ export default {
           const data = JSON.parse(xhr.responseText)
           if (data['flg']) {
             document.getElementById('competition_start').disabled = true // 対戦開始ボタンの操作を不可にする
-            document.getElementById('next_play').disabled = false // 再戦するボタンの操作を可能にする
-            document.getElementById('exit_play').disabled = false // 退出するボタンの操作を可能にする
           }
           data['msg'] !== '' ? alert(data['msg']) : ''
         }
@@ -432,8 +448,6 @@ export default {
           const data = JSON.parse(xhr.responseText)
           if (data['flg']) {
             document.getElementById('competition_start').disabled = true // 対戦開始ボタンの操作を不可にする
-            document.getElementById('next_play').disabled = false // 再戦するボタンの操作を可能にする
-            document.getElementById('exit_play').disabled = false // 退出するボタンの操作を可能にする
           }
           data['msg'] !== '' ? alert(data['msg']) : ''
         }
@@ -454,7 +468,7 @@ export default {
         }
       }
     },
-    exitPlay: function() {
+    exitPlay() {
       if (localStorage.getItem('msweep') !== null) {
         const param = 'id=' + localStorage.getItem
         const url = '/exit/?' + param
@@ -471,7 +485,7 @@ export default {
         }
       }
     },
-    nextPlay: function() {
+    nextPlay() {
       if (localStorage.getItem('msweep') !== null) {
         let next_flg = true
         const id = localStorage.getItem('msweep')
@@ -616,6 +630,37 @@ export default {
 
 #next_play,
 #exit_play {
-  margin-top: 5px;
+  margin: 10px;
+  text-align: center;
+  background: transparent;
+  border: 1px solid #1ebeb4;
+  color: #1ebeb4;
+}
+#modal-content {
+  width: 40%;
+  padding: 10px 20px;
+  border: 2px solid #aaa;
+  background: #fff;
+  position: fixed;
+  display: none;
+  z-index: 2;
+  text-align: center;
+}
+
+#modal-content-innar {
+  margin: 0 auto;
+  width: 100%;
+  z-index: 2;
+}
+
+#modal-bg {
+  z-index: 1;
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 120%;
+  background-color: rgba(0, 0, 0, 0.55);
 }
 </style>
