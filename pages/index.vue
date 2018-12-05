@@ -97,261 +97,271 @@ export default {
   data() {
     return {
       init_flg: false, //盤面表示判定フラグ
-      intervalId: undefined
+      play_flg: false, //試合中か否かの判定フラグ
+      restart_flg: false, //再入室したか否かの判定フラグ
+      final_flg: false, //試合終了したか否かの判定フラグ
+      next_flg: false, //再戦希望か否かの判定フラグ
+      final_msg: '', //最終メッセージ
+      setIntervalObj: null
     }
   },
   mounted() {
-    //*******************変数宣言領域***********************************
-    let play_flg = false //試合中か否かの判定フラグ
-    let restart_flg = false //再入室したか否かの判定フラグ
-    let final_flg = false //試合終了したか否かの判定フラグ
-    let next_flg = false //再戦希望か否かの判定フラグ
-    let msg_roomA = [] //メッセージ管理用
-    const COLS = 10 //横10マス
-    const ROWS = 10 //縦10マス
-    const xhr = new XMLHttpRequest() //サーバ通信リクエスト用オブジェクト
-    let tmpResponse //サーバ通信レスポンス結果格納用変数
-    let url //サーバ通信リクエスト用変数
-    let param //サーバ通信リクエストパラメーター用変数
-    //****************************************************************
-    // ポーリング処理
-    this.intervalId = setInterval(function() {
-      if (play_flg) {
-        if (final_flg === false) {
-          const playerID = localStorage.getItem('msweep')
-          param = 'id=' + playerID
-          url = '/draw/?' + param
-          xhr.open('GET', url, true)
-          xhr.send()
-
-          // サーバーからの応答内容を処理
-          xhr.onreadystatechange = () => {
-            if (xhr.readyState === 4 && xhr.status === 200) {
-              tmpResponse = JSON.parse(xhr.responseText)
-              if (tmpResponse['msg'] === '' || restart_flg) {
-                const state_info = tmpResponse['map']
-                restart_flg = false // 再入室時１回のみの処理
-
-                //y座標の処理ループ
-                for (let q = 1; q <= ROWS; q++) {
-                  //x座標の処理ループ
-                  for (let t = 0; t < COLS; t++) {
-                    let y = document.getElementById('y=' + q)
-                    let x = document.getElementById('y=' + q).childNodes[t]
-                    if (state_info[q - 1][t]['opened'] === false) {
-                      if (x.classList.length === 2) {
-                        x.classList.remove('splite_flg') //フラグを削除するため画像を削除
-                        x.style.backgroundColor = 'darkgrey' //マスを閉じた状態に戻す描画
-                      }
-                    } else if (
-                      state_info[q - 1][t]['opened'] &&
-                      state_info[q - 1][t]['hasFlag'] === false
-                    ) {
-                      x.style.backgroundColor = 'whitesmoke' //マスを開いた状態を描画
-                      // 該当箇所に爆弾が無く、周囲に爆弾があれば、爆弾の個数を描画
-                      if (state_info[q - 1][t]['numBom'] !== '') {
-                        switch (state_info[q - 1][t]['numBom']) {
-                          case 1:
-                            x.classList.add('splite1')
-                            break
-                          case 2:
-                            x.classList.add('splite2')
-                            break
-                          case 3:
-                            x.classList.add('splite3')
-                            break
-                          case 4:
-                            x.classList.add('splite4')
-                            break
-                          case 5:
-                            x.classList.add('splite5')
-                            break
-                          case 6:
-                            x.classList.add('splite6')
-                            break
-                          case 7:
-                            x.classList.add('splite7')
-                            break
-                          case 8:
-                            x.classList.add('splite8')
-                            break
-                          default:
-                            break
-                        }
-                      }
-                    } else if (
-                      state_info[q - 1][t]['opened'] &&
-                      state_info[q - 1][t]['hasFlag']
-                    ) {
-                      x.style.backgroundColor = 'whitesmoke' //マスを開いた状態を描画
-                      x.classList.add('splite_flg') //フラグ画像を描画
-                    }
-                  }
-                }
-              } else {
-                // 試合終了のメッセージ表示
-                if (final_flg === false) {
-                  final_flg = true //試合終了フラグをONにする
-                  const target = document.getElementById('target_bg')
-                  target.innerHTML = "<div id='modal-bg'></div>"
-                  const modal_bg = document.getElementById('modal-bg')
-                  const modal_content = document.getElementById('modal-content')
-                  const modal_content_innar = document.getElementById(
-                    'modal-content-innar'
-                  )
-                  const w = window.innerWidth
-                  const h = window.innerHeight
-                  const cw = modal_content_innar.getBoundingClientRect().width
-                  const ch = modal_content_innar.getBoundingClientRect().height
-
-                  //取得した値をcssに追加する
-                  modal_content.style.left = (w - cw) / 3 + 'px'
-                  modal_content.style.top = +((h - ch) / 3) + 'px'
-
-                  modal_content.style.display = 'block'
-                  modal_bg.style.display = 'block'
-
-                  modal_content_innar.innerHTML =
-                    '<p>' +
-                    tmpResponse['msg'] +
-                    '</p>' +
-                    "<button id='next_play' onclick='nextPlay()' >再戦する</button>" +
-                    "<button id='exit_play' onclick='exitPlay()' >退出する</button>"
-                  document.getElementById('competition_start').disabled = true // 対戦開始ボタンの操作を不可にする
-                }
-              }
-            }
-          }
-        } else if (final_flg && next_flg === false) {
-          url = '/nextstatus/'
-          xhr.open('GET', url, true)
-          xhr.send()
-
-          // サーバーからの応答内容を処理
-          xhr.onreadystatechange = () => {
-            if (xhr.readyState === 4 && xhr.status === 200) {
-              const nextFlg = JSON.parse(xhr.responseText)
-              if (nextFlg['flg']) {
-                // 確認ダイアログの表示
-                if (
-                  window.confirm(
-                    '対戦相手が再戦を希望しています。再戦されますか？\n再戦する場合はOK、退出する場合はキャンセルを押してください。'
-                  )
-                ) {
-                  // OKボタン押下時の処理
-                  url = '/nextstart/'
-                  xhr.open('GET', url, true)
-                  xhr.send()
-
-                  // サーバーからの応答内容を処理
-                  xhr.onreadystatechange = () => {
-                    if (xhr.readyState === 4 && xhr.status === 200) {
-                      const tmp = JSON.parse(xhr.responseText)
-                      // init(); //初期化処理を実施する
-                      final_flg = false
-                      document.getElementById(
-                        'competition_start'
-                      ).disabled = false // 対戦開始ボタンの操作を可能にする
-                      document.getElementById('next_play').disabled = true // 再戦するボタンの操作を不可にする
-                      document.getElementById('exit_play').disabled = true // 退出するボタンの操作を不可にする
-                      alert(tmp)
-                    }
-                  }
-                } else {
-                  // キャンセルボタン押下時の処理
-                  param = 'id=' + localStorage.getItem('msweep')
-                  url = '/exit/?' + param
-                  xhr.open('GET', url, true)
-                  xhr.send()
-
-                  // サーバーからの応答内容を処理
-                  xhr.onreadystatechange = () => {
-                    if (xhr.readyState === 4 && xhr.status === 200) {
-                      localStorage.removeItem('msweep') //ローカルストレージのIDを削除
-                      window.open('/', '_self').close() //画面を閉じる
-                    }
-                  }
-                }
-              }
-            }
-          }
-        } else if (final_flg && next_flg) {
-          url = '/nextwait/'
-          xhr.open('GET', url, true)
-          xhr.send()
-
-          // サーバーからの応答内容を処理
-          xhr.onreadystatechange = () => {
-            if (xhr.readyState === 4 && xhr.status === 200) {
-              let reply = JSON.parse(xhr.responseText)
-              switch (reply['flg']) {
-                case 'exit':
-                  alert(reply['msg'])
-                  next_flg = false
-                  play_flg = false
-                  final_flg = false
-                  break
-                case 'replay':
-                  next_flg = false
-                  final_flg = false
-                  alert(reply['msg'])
-                  break
-                default:
-                  break
-              }
-            }
-          }
-        }
-      } else {
-        // 対戦相手が試合開始しているか否か判定
-        if (localStorage.getItem('msweep') !== null) {
-          param = 'id=' + localStorage.getItem('msweep')
-          url = '/status/?' + param
-          xhr.open('GET', url, true)
-          xhr.send()
-
-          // サーバーからの応答内容を処理
-          xhr.onreadystatechange = () => {
-            if (xhr.readyState === 4 && xhr.status === 200) {
-              tmpResponse = JSON.parse(xhr.responseText)
-              tmpResponse['flg']
-                ? (play_flg = tmpResponse['flg']) //試合開始する
-                : ''
-              if (play_flg) {
-                alert(tmpResponse['msg'])
-              } else {
-                if (tmpResponse['msg'].length > 0 && msg_roomA.length < 2) {
-                  for (let t = 0; t < tmpResponse['msg'].length; t++) {
-                    if (msg_roomA.length !== 0) {
-                      msg_roomA[0] !== tmpResponse['msg'][t]
-                        ? msg_roomA.push(tmpResponse['msg'][t])
-                        : ''
-                      if (msg_roomA[0] !== tmpResponse['msg'][t]) {
-                        let content = msg_roomA[0]
-                        for (let s = 1; s < msg_roomA.length; s++) {
-                          content = content + '\n\n' + msg_roomA[s]
-                        }
-                        document.getElementById('msg').value = content
-                      }
-                    } else {
-                      msg_roomA.push(tmpResponse['msg'][t])
-                      let content = msg_roomA[0]
-                      document.getElementById('msg').value = content
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }, 1000)
+    this.init()
   },
   beforeDestroy() {
     console.log('clearInterval')
-    clearInterval(this.intervalId)
+    clearInterval(this.setIntervalObj)
   },
   methods: {
+    // ポーリング処理
+    init: function() {
+      //*******************変数宣言領域***********************************
+      let msg_roomA = [] //メッセージ管理用
+      const COLS = 10 //横10マス
+      const ROWS = 10 //縦10マス
+      const xhr = new XMLHttpRequest() //サーバ通信リクエスト用オブジェクト
+      let tmpResponse //サーバ通信レスポンス結果格納用変数
+      let url //サーバ通信リクエスト用変数
+      let param //サーバ通信リクエストパラメーター用変数
+      //****************************************************************
+      this.setIntervalObj = setInterval(function() {
+        if (this.play_flg) {
+          if (this.final_flg === false) {
+            const playerID = localStorage.getItem('msweep')
+            param = 'id=' + playerID
+            url = '/draw/?' + param
+            xhr.open('GET', url, true)
+            xhr.send()
+
+            // サーバーからの応答内容を処理
+            xhr.onreadystatechange = () => {
+              if (xhr.readyState === 4 && xhr.status === 200) {
+                tmpResponse = JSON.parse(xhr.responseText)
+                if (tmpResponse['msg'] === '' || this.restart_flg) {
+                  const state_info = tmpResponse['map']
+                  this.restart_flg = false // 再入室時１回のみの処理
+
+                  //y座標の処理ループ
+                  for (let q = 1; q <= ROWS; q++) {
+                    //x座標の処理ループ
+                    for (let t = 0; t < COLS; t++) {
+                      let y = document.getElementById('y=' + q)
+                      let x = document.getElementById('y=' + q).childNodes[t]
+                      if (state_info[q - 1][t]['opened'] === false) {
+                        if (x.classList.length === 2) {
+                          x.classList.remove('splite_flg') //フラグを削除するため画像を削除
+                          x.style.backgroundColor = 'darkgrey' //マスを閉じた状態に戻す描画
+                        }
+                      } else if (
+                        state_info[q - 1][t]['opened'] &&
+                        state_info[q - 1][t]['hasFlag'] === false
+                      ) {
+                        x.style.backgroundColor = 'whitesmoke' //マスを開いた状態を描画
+                        // 該当箇所に爆弾が無く、周囲に爆弾があれば、爆弾の個数を描画
+                        if (state_info[q - 1][t]['numBom'] !== '') {
+                          switch (state_info[q - 1][t]['numBom']) {
+                            case 1:
+                              x.classList.add('splite1')
+                              break
+                            case 2:
+                              x.classList.add('splite2')
+                              break
+                            case 3:
+                              x.classList.add('splite3')
+                              break
+                            case 4:
+                              x.classList.add('splite4')
+                              break
+                            case 5:
+                              x.classList.add('splite5')
+                              break
+                            case 6:
+                              x.classList.add('splite6')
+                              break
+                            case 7:
+                              x.classList.add('splite7')
+                              break
+                            case 8:
+                              x.classList.add('splite8')
+                              break
+                            default:
+                              break
+                          }
+                        }
+                      } else if (
+                        state_info[q - 1][t]['opened'] &&
+                        state_info[q - 1][t]['hasFlag']
+                      ) {
+                        x.style.backgroundColor = 'whitesmoke' //マスを開いた状態を描画
+                        x.classList.add('splite_flg') //フラグ画像を描画
+                      }
+                    }
+                  }
+                } else {
+                  // 試合終了のメッセージ表示
+                  if (this.final_flg === false) {
+                    this.final_flg = true //試合終了フラグをONにする
+                    this.final_msg = tmpResponse['msg'] //盤面の試合終了msgを登録する
+                    const target = document.getElementById('target_bg')
+                    target.innerHTML = "<div id='modal-bg'></div>"
+                    const modal_bg = document.getElementById('modal-bg')
+                    const modal_content = document.getElementById(
+                      'modal-content'
+                    )
+                    const modal_content_innar = document.getElementById(
+                      'modal-content-innar'
+                    )
+                    const w = window.innerWidth
+                    const h = window.innerHeight
+                    const cw = modal_content_innar.getBoundingClientRect().width
+                    const ch = modal_content_innar.getBoundingClientRect()
+                      .height
+
+                    //取得した値をcssに追加する
+                    modal_content.style.left = (w - cw) / 3 + 'px'
+                    modal_content.style.top = +((h - ch) / 3) + 'px'
+
+                    modal_content.style.display = 'block'
+                    modal_bg.style.display = 'block'
+
+                    modal_content_innar.innerHTML =
+                      '<p>' +
+                      this.final_msg +
+                      '</p>' +
+                      "<button id='next_play' onclick='this.nextPlay()' >再戦する</button>" +
+                      "<button id='exit_play' onclick='this.exitPlay()' >退出する</button>"
+
+                    document.getElementById('competition_start').disabled = true // 対戦開始ボタンの操作を不可にする
+                  }
+                }
+              }
+            }
+          } else if (this.final_flg && this.next_flg === false) {
+            url = '/nextstatus/'
+            xhr.open('GET', url, true)
+            xhr.send()
+
+            // サーバーからの応答内容を処理
+            xhr.onreadystatechange = () => {
+              if (xhr.readyState === 4 && xhr.status === 200) {
+                const nextFlg = JSON.parse(xhr.responseText)
+                if (nextFlg['flg']) {
+                  // 確認ダイアログの表示
+                  if (
+                    window.confirm(
+                      '対戦相手が再戦を希望しています。再戦されますか？\n再戦する場合はOK、退出する場合はキャンセルを押してください。'
+                    )
+                  ) {
+                    // OKボタン押下時の処理
+                    url = '/nextstart/'
+                    xhr.open('GET', url, true)
+                    xhr.send()
+
+                    // サーバーからの応答内容を処理
+                    xhr.onreadystatechange = () => {
+                      if (xhr.readyState === 4 && xhr.status === 200) {
+                        const tmp = JSON.parse(xhr.responseText)
+                        // init(); //初期化処理を実施する
+                        this.final_flg = false
+                        document.getElementById(
+                          'competition_start'
+                        ).disabled = false // 対戦開始ボタンの操作を可能にする
+                        document.getElementById('next_play').disabled = true // 再戦するボタンの操作を不可にする
+                        document.getElementById('exit_play').disabled = true // 退出するボタンの操作を不可にする
+                        alert(tmp)
+                      }
+                    }
+                  } else {
+                    // キャンセルボタン押下時の処理
+                    param = 'id=' + localStorage.getItem('msweep')
+                    url = '/exit/?' + param
+                    xhr.open('GET', url, true)
+                    xhr.send()
+
+                    // サーバーからの応答内容を処理
+                    xhr.onreadystatechange = () => {
+                      if (xhr.readyState === 4 && xhr.status === 200) {
+                        localStorage.removeItem('msweep') //ローカルストレージのIDを削除
+                        window.open('/', '_self').close() //画面を閉じる
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          } else if (this.final_flg && this.next_flg) {
+            url = '/nextwait/'
+            xhr.open('GET', url, true)
+            xhr.send()
+
+            // サーバーからの応答内容を処理
+            xhr.onreadystatechange = () => {
+              if (xhr.readyState === 4 && xhr.status === 200) {
+                let reply = JSON.parse(xhr.responseText)
+                switch (reply['flg']) {
+                  case 'exit':
+                    alert(reply['msg'])
+                    this.next_flg = false
+                    this.play_flg = false
+                    this.final_flg = false
+                    break
+                  case 'replay':
+                    this.next_flg = false
+                    this.final_flg = false
+                    alert(reply['msg'])
+                    break
+                  default:
+                    break
+                }
+              }
+            }
+          }
+        } else {
+          // 対戦相手が試合開始しているか否か判定
+          if (localStorage.getItem('msweep') !== null) {
+            param = 'id=' + localStorage.getItem('msweep')
+            url = '/status/?' + param
+            xhr.open('GET', url, true)
+            xhr.send()
+
+            // サーバーからの応答内容を処理
+            xhr.onreadystatechange = () => {
+              if (xhr.readyState === 4 && xhr.status === 200) {
+                tmpResponse = JSON.parse(xhr.responseText)
+                if (tmpResponse['flg']) {
+                  this.play_flg = tmpResponse['flg'] //試合開始する
+                  this.final_flg = false
+                }
+                if (this.play_flg) {
+                  alert(tmpResponse['msg'])
+                } else {
+                  if (tmpResponse['msg'].length > 0 && msg_roomA.length < 2) {
+                    for (let t = 0; t < tmpResponse['msg'].length; t++) {
+                      if (msg_roomA.length !== 0) {
+                        msg_roomA[0] !== tmpResponse['msg'][t]
+                          ? msg_roomA.push(tmpResponse['msg'][t])
+                          : ''
+                        if (msg_roomA[0] !== tmpResponse['msg'][t]) {
+                          let content = msg_roomA[0]
+                          for (let s = 1; s < msg_roomA.length; s++) {
+                            content = content + '\n\n' + msg_roomA[s]
+                          }
+                          document.getElementById('msg').value = content
+                        }
+                      } else {
+                        msg_roomA.push(tmpResponse['msg'][t])
+                        let content = msg_roomA[0]
+                        document.getElementById('msg').value = content
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }, 1000)
+    },
     start(idname) {
       const obj = document.getElementById(idname)
       const idx = obj.selectedIndex
@@ -468,7 +478,7 @@ export default {
         }
       }
     },
-    exitPlay() {
+    exitPlay: function() {
       if (localStorage.getItem('msweep') !== null) {
         const param = 'id=' + localStorage.getItem
         const url = '/exit/?' + param
@@ -485,7 +495,7 @@ export default {
         }
       }
     },
-    nextPlay() {
+    nextPlay: function() {
       if (localStorage.getItem('msweep') !== null) {
         let next_flg = true
         const id = localStorage.getItem('msweep')
