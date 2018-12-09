@@ -81,19 +81,21 @@
         </button>
       </div>
     </div>
-    <!-- モーダルウィンドウ -->
-    <div id="modal-content">
-      <!-- モーダルウィンドウのコンテンツ開始 -->
-      <div id="modal-content-innar"/>
-      <!-- モーダルウィンドウのコンテンツ終了 -->
-    </div>
-    <div id="target_bg"/>
-    <!-- モーダルウィンドウ -->
+
+    <Modal
+      :final_flg="final_flg"
+      :final_msg="final_msg"
+    />
   </section>
 </template>
 
 <script>
+import Modal from '~/components/Modal.vue'
+
 export default {
+  components: {
+    Modal
+  },
   data() {
     return {
       init_flg: false, //盤面表示判定フラグ
@@ -108,10 +110,10 @@ export default {
   mounted() {
     this.init()
   },
-  beforeDestroy() {
-    console.log('clearInterval')
-    clearInterval(this.setIntervalObj)
-  },
+  // beforeDestroy() {
+  //   console.log('clearInterval')
+  //   clearInterval(this.setIntervalObj)
+  // },
   methods: {
     // ポーリング処理
     init: function() {
@@ -125,6 +127,7 @@ export default {
       let param //サーバ通信リクエストパラメーター用変数
       //****************************************************************
       this.setIntervalObj = setInterval(function() {
+        console.log(this.final_flg)
         if (this.play_flg) {
           if (this.final_flg === false) {
             const playerID = localStorage.getItem('msweep')
@@ -202,35 +205,6 @@ export default {
                   if (this.final_flg === false) {
                     this.final_flg = true //試合終了フラグをONにする
                     this.final_msg = tmpResponse['msg'] //盤面の試合終了msgを登録する
-                    const target = document.getElementById('target_bg')
-                    target.innerHTML = "<div id='modal-bg'></div>"
-                    const modal_bg = document.getElementById('modal-bg')
-                    const modal_content = document.getElementById(
-                      'modal-content'
-                    )
-                    const modal_content_innar = document.getElementById(
-                      'modal-content-innar'
-                    )
-                    const w = window.innerWidth
-                    const h = window.innerHeight
-                    const cw = modal_content_innar.getBoundingClientRect().width
-                    const ch = modal_content_innar.getBoundingClientRect()
-                      .height
-
-                    //取得した値をcssに追加する
-                    modal_content.style.left = (w - cw) / 3 + 'px'
-                    modal_content.style.top = +((h - ch) / 3) + 'px'
-
-                    modal_content.style.display = 'block'
-                    modal_bg.style.display = 'block'
-
-                    modal_content_innar.innerHTML =
-                      '<p>' +
-                      this.final_msg +
-                      '</p>' +
-                      "<button id='next_play' onclick='this.nextPlay()' >再戦する</button>" +
-                      "<button id='exit_play' onclick='this.exitPlay()' >退出する</button>"
-
                     document.getElementById('competition_start').disabled = true // 対戦開始ボタンの操作を不可にする
                   }
                 }
@@ -331,6 +305,9 @@ export default {
                 if (tmpResponse['flg']) {
                   this.play_flg = tmpResponse['flg'] //試合開始する
                   this.final_flg = false
+                  this.restart_flg = false
+                  this.next_flg = false
+                  this.final_msg = ''
                 }
                 if (this.play_flg) {
                   alert(tmpResponse['msg'])
@@ -636,41 +613,5 @@ export default {
   border: 1px outset black;
   width: 326px;
   font-size: 12px;
-}
-
-#next_play,
-#exit_play {
-  margin: 10px;
-  text-align: center;
-  background: transparent;
-  border: 1px solid #1ebeb4;
-  color: #1ebeb4;
-}
-#modal-content {
-  width: 40%;
-  padding: 10px 20px;
-  border: 2px solid #aaa;
-  background: #fff;
-  position: fixed;
-  display: none;
-  z-index: 2;
-  text-align: center;
-}
-
-#modal-content-innar {
-  margin: 0 auto;
-  width: 100%;
-  z-index: 2;
-}
-
-#modal-bg {
-  z-index: 1;
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 120%;
-  background-color: rgba(0, 0, 0, 0.55);
 }
 </style>
