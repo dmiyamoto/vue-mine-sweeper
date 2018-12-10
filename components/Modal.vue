@@ -2,7 +2,6 @@
   <section>
     <!-- モーダルウィンドウ -->
     <div
-      v-show="final_flg"
       id="modal-content"
     >
       <!-- モーダルウィンドウのコンテンツ開始 -->
@@ -24,7 +23,6 @@
     <!-- モーダルウィンドウのコンテンツ終了 -->
     </div>
     <div
-      v-show="final_flg"
       id="modal-bg"
     />
     <!-- モーダルウィンドウ -->
@@ -34,10 +32,6 @@
 <script>
 export default {
   props: {
-    final_flg: {
-      type: Boolean,
-      default: false
-    },
     final_msg: {
       type: String,
       default: '現在、試合中ではございません。'

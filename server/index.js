@@ -542,18 +542,61 @@ app.get('/set', function(req, res) {
         state['score']['two'] = state['score']['two'] + 1
         msg = ''
       } else {
-        state['player']['oneID'] === data['id']
-          ? (state['explosion']['player'] = state['player']['oneID'])
-          : (state['explosion']['player'] = state['player']['twoID'])
+        if(state['player']['oneID'] === data['id']){
+          if(state['explosion']['player'] === ''){
+            (state['explosion']['player'] = state['player']['oneID'])
+            msg = '爆弾に引っかかったので、' + state['player']['one'] + 'さんの負けになります。'
+          }else{
+            msg = '対戦相手が爆弾に引っかかったので、あなたの勝利です。'
+          }
+        }else{
+          if(state['explosion']['player'] === ''){
+            (state['explosion']['player'] = state['player']['twoID'])
+            msg = '爆弾に引っかかったので、' + state['player']['two'] + 'さんの負けになります。'
+          }else{
+            msg = '対戦相手が爆弾に引っかかったので、あなたの勝利です。'
+          }
+        }
         final_flg = true
-        msg = ''
       }
     }
   } else if (play_flg === false && final_flg === false) {
     msg = 'まだ試合中では無いので操作できません。'
-  } else {
-    msg =
-      '試合は終了しました。\n再試合を希望される場合は「再戦する」、当ゲームを終了する場合は「退出する」ボタンを押してください。'
+  } else if (play_flg && final_flg) {
+    if(state['player']['oneID'] === data['id']){
+      if(state['explosion']['player'] === ''){
+        (state['explosion']['player'] = state['player']['oneID'])
+        msg = '爆弾に引っかかったので、' + state['player']['one'] + 'さんの負けになります。'
+      }else{
+        msg = '対戦相手が爆弾に引っかかったので、あなたの勝利です。'
+      }
+    }else{
+      if(state['explosion']['player'] === ''){
+        (state['explosion']['player'] = state['player']['twoID'])
+        msg = '爆弾に引っかかったので、' + state['player']['two'] + 'さんの負けになります。'
+      }else{
+        msg = '対戦相手が爆弾に引っかかったので、あなたの勝利です。'
+      }
+    }
+  } else if (play_flg) {
+    final_flg = true
+    const part =
+      '  ' +
+      state['player']['one'] +
+      'さん：' +
+      state['score']['one'] +
+      '点\n  ' +
+      state['player']['two'] +
+      'さん：' +
+      state['score']['two'] +
+      '点'
+    if (state['score']['one'] === state['score']['two']) {
+      msg = 'この勝負は引き分けになります。\n' + part
+    } else if (state['score']['one'] > state['score']['two']) {
+      msg = state['player']['one'] + 'さんの勝利です。\n' + part
+    } else {
+      msg = state['player']['two'] + 'さんの勝利です。\n' + part
+    }
   }
   res.set('Access-Control-Allow-Origin', process.env.ALLOW_ORIGIN)
   res.json({ msg: msg, flg: final_flg, id: data['id'] })
@@ -561,7 +604,8 @@ app.get('/set', function(req, res) {
 
 app.get('/draw', function(req, res) {
   const data = req.query
-  let cnt = 0
+  let cnt = 0 // 開いているマスの数＋爆弾の埋まっている数の合計
+
   // 爆弾が埋まっている数＋現在開いているマスの数を計測
   play_flg
     ? [...Array(ROWS)].reduce(

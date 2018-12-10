@@ -81,11 +81,13 @@
         </button>
       </div>
     </div>
-
-    <Modal
-      :final_flg="final_flg"
-      :final_msg="final_msg"
-    />
+    <div
+      v-if="final_flg"
+    >
+      <modal
+        :final_msg="final_msg"
+      />
+    </div>
   </section>
 </template>
 
@@ -110,10 +112,6 @@ export default {
   mounted() {
     this.init()
   },
-  // beforeDestroy() {
-  //   console.log('clearInterval')
-  //   clearInterval(this.setIntervalObj)
-  // },
   methods: {
     // ポーリング処理
     init: function() {
@@ -127,7 +125,6 @@ export default {
       let param //サーバ通信リクエストパラメーター用変数
       //****************************************************************
       this.setIntervalObj = setInterval(function() {
-        console.log(this.final_flg)
         if (this.play_flg) {
           if (this.final_flg === false) {
             const playerID = localStorage.getItem('msweep')
@@ -204,8 +201,6 @@ export default {
                   // 試合終了のメッセージ表示
                   if (this.final_flg === false) {
                     this.final_flg = true //試合終了フラグをONにする
-                    this.final_msg = tmpResponse['msg'] //盤面の試合終了msgを登録する
-                    document.getElementById('competition_start').disabled = true // 対戦開始ボタンの操作を不可にする
                   }
                 }
               }
@@ -413,9 +408,10 @@ export default {
         if (xhr.readyState === 4 && xhr.status === 200) {
           const data = JSON.parse(xhr.responseText)
           if (data['flg']) {
+            this.final_flg = true //試合終了フラグをONにする
+            this.final_msg = data['msg'] //盤面の試合終了msgを登録する
             document.getElementById('competition_start').disabled = true // 対戦開始ボタンの操作を不可にする
           }
-          data['msg'] !== '' ? alert(data['msg']) : ''
         }
       }
     },
@@ -434,9 +430,10 @@ export default {
         if (xhr.readyState === 4 && xhr.status === 200) {
           const data = JSON.parse(xhr.responseText)
           if (data['flg']) {
+            this.final_flg = true //試合終了フラグをONにする
+            this.final_msg = data['msg'] //盤面の試合終了msgを登録する
             document.getElementById('competition_start').disabled = true // 対戦開始ボタンの操作を不可にする
           }
-          data['msg'] !== '' ? alert(data['msg']) : ''
         }
       }
     },
@@ -485,9 +482,9 @@ export default {
         // サーバーからの応答内容を処理
         xhr.onreadystatechange = () => {
           if (xhr.readyState === 4 && xhr.status === 200) {
-            next_flg = true
+            this.next_flg = true
           } else {
-            next_flg = false
+            this.next_flg = false
           }
         }
       }
