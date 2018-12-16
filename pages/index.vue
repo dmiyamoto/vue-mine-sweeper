@@ -127,9 +127,7 @@ export default {
       this.setIntervalObj = setInterval(function() {
         if (this.play_flg) {
           if (this.final_flg === false) {
-            const playerID = localStorage.getItem('msweep')
-            param = 'id=' + playerID
-            url = '/draw/?' + param
+            url = '/draw/'
             xhr.open('GET', url, true)
             xhr.send()
 
@@ -137,7 +135,7 @@ export default {
             xhr.onreadystatechange = () => {
               if (xhr.readyState === 4 && xhr.status === 200) {
                 tmpResponse = JSON.parse(xhr.responseText)
-                if (tmpResponse['msg'] === '' || this.restart_flg) {
+                if (tmpResponse['flg'] === false || this.restart_flg) {
                   const state_info = tmpResponse['map']
                   this.restart_flg = false // 再入室時１回のみの処理
 
@@ -407,6 +405,7 @@ export default {
       xhr.onreadystatechange = () => {
         if (xhr.readyState === 4 && xhr.status === 200) {
           const data = JSON.parse(xhr.responseText)
+          console.log(data)
           if (data['flg']) {
             this.final_flg = true //試合終了フラグをONにする
             this.final_msg = data['msg'] //盤面の試合終了msgを登録する
@@ -449,43 +448,6 @@ export default {
           JSON.parse(xhr.responseText) !== ''
             ? alert(JSON.parse(xhr.responseText))
             : ''
-        }
-      }
-    },
-    exitPlay: function() {
-      if (localStorage.getItem('msweep') !== null) {
-        const param = 'id=' + localStorage.getItem
-        const url = '/exit/?' + param
-        const xhr = new XMLHttpRequest()
-        xhr.open('GET', url, true)
-        xhr.send()
-
-        // サーバーからの応答内容を処理
-        xhr.onreadystatechange = () => {
-          if (xhr.readyState === 4 && xhr.status === 200) {
-            localStorage.removeItem('msweep') //ローカルストレージのIDを削除
-            window.open('/', '_self').close() //画面を閉じる
-          }
-        }
-      }
-    },
-    nextPlay: function() {
-      if (localStorage.getItem('msweep') !== null) {
-        let next_flg = true
-        const id = localStorage.getItem('msweep')
-        const param = 'id=' + id
-        const url = '/nextplay/?' + param
-        const xhr = new XMLHttpRequest()
-        xhr.open('GET', url, true)
-        xhr.send()
-
-        // サーバーからの応答内容を処理
-        xhr.onreadystatechange = () => {
-          if (xhr.readyState === 4 && xhr.status === 200) {
-            this.next_flg = true
-          } else {
-            this.next_flg = false
-          }
         }
       }
     }

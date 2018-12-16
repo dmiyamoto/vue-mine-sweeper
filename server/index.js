@@ -139,13 +139,10 @@ app.get('/restart', function(req, res) {
   let reFlag = { flg: false, name: '' }
   switch (room['opval']) {
     case 'roomA':
-      ;[...Array(roomA.length)].reduce(
-        (acc, c, idx) =>
-          roomA[idx]['id'] === room['id']
-            ? (reFlag = { flg: true, name: roomA[idx]['player'] })
-            : '',
-        ''
-      )
+      for(let i = 0; i < roomA.length; i += 1){
+        if(roomA[i]['id'] === room['id']) reFlag = { flg: true, name: roomA[idx]['player'] }
+      }
+
       reFlag['flg']
         ? (msg = reFlag['name'] + 'が、' + room['optxt'] + 'に再入室しました')
         : (msg = 'その部屋は他のプレーヤーが対戦中です。')
@@ -326,10 +323,22 @@ app.get('/status', function(req, res) {
 
 app.get('/set', function(req, res) {
   const data = req.query
+  let cnt = 0 // 開いているブロック数の合計
+
+  // 現在開いているマスの数を計測
+  if(play_flg){
+    for(let i = 0; i < ROWS; i += 1){
+      for(let s = 0; s < COLS; s += 1){
+        cnt = cnt + (state['map'][i][s]['opened'] ? 1 : 0);
+      }
+    }
+  }
+
   // 試合中かつ対象のプレイヤーなら、操作を可能とする
   if (
     play_flg &&
     final_flg === false &&
+    cnt !== COLS * ROWS &&
     (data['id'] === state['player']['oneID'] ||
       data['id'] === state['player']['twoID'])
   ) {
@@ -560,25 +569,9 @@ app.get('/set', function(req, res) {
         final_flg = true
       }
     }
-  } else if (play_flg === false && final_flg === false) {
+  } else if (play_flg === false && final_flg === false && cnt !== COLS * ROWS) {
     msg = 'まだ試合中では無いので操作できません。'
-  } else if (play_flg && final_flg) {
-    if(state['player']['oneID'] === data['id']){
-      if(state['explosion']['player'] === ''){
-        (state['explosion']['player'] = state['player']['oneID'])
-        msg = '爆弾に引っかかったので、' + state['player']['one'] + 'さんの負けになります。'
-      }else{
-        msg = '対戦相手が爆弾に引っかかったので、あなたの勝利です。'
-      }
-    }else{
-      if(state['explosion']['player'] === ''){
-        (state['explosion']['player'] = state['player']['twoID'])
-        msg = '爆弾に引っかかったので、' + state['player']['two'] + 'さんの負けになります。'
-      }else{
-        msg = '対戦相手が爆弾に引っかかったので、あなたの勝利です。'
-      }
-    }
-  } else if (play_flg) {
+  } else if (play_flg && cnt === COLS * ROWS) {
     final_flg = true
     const part =
       '  ' +
@@ -597,68 +590,30 @@ app.get('/set', function(req, res) {
     } else {
       msg = state['player']['two'] + 'さんの勝利です。\n' + part
     }
+  } else if (play_flg && final_flg && cnt !== COLS * ROWS) {
+    if(state['player']['oneID'] === data['id']){
+      if(state['explosion']['player'] === ''){
+        (state['explosion']['player'] = state['player']['oneID'])
+        msg = '爆弾に引っかかったので、' + state['player']['one'] + 'さんの負けになります。'
+      }else{
+        msg = '対戦相手が爆弾に引っかかったので、あなたの勝利です。'
+      }
+    }else{
+      if(state['explosion']['player'] === ''){
+        (state['explosion']['player'] = state['player']['twoID'])
+        msg = '爆弾に引っかかったので、' + state['player']['two'] + 'さんの負けになります。'
+      }else{
+        msg = '対戦相手が爆弾に引っかかったので、あなたの勝利です。'
+      }
+    }
   }
   res.set('Access-Control-Allow-Origin', process.env.ALLOW_ORIGIN)
   res.json({ msg: msg, flg: final_flg, id: data['id'] })
 })
 
 app.get('/draw', function(req, res) {
-  const data = req.query
-  let cnt = 0 // 開いているマスの数＋爆弾の埋まっている数の合計
-
-  // 爆弾が埋まっている数＋現在開いているマスの数を計測
-  play_flg
-    ? [...Array(ROWS)].reduce(
-        (acc, c, idx) =>
-          [...Array(COLS)].reduce(
-            (acc2, c2, idx2) =>
-              state['map'][idx][idx2]['opened']
-                ? (cnt = cnt + 1)
-                : (cnt = cnt + 0),
-            ''
-          ),
-        ''
-      )
-    : ''
   res.set('Access-Control-Allow-Origin', process.env.ALLOW_ORIGIN)
-  if (cnt !== COLS * ROWS && final_flg === false) {
-    res.json({ msg: '', map: state['client'] })
-  } else if (cnt !== COLS * ROWS && final_flg) {
-    state['explosion']['player'] === data['id']
-      ? state['player']['oneID'] === data['id']
-        ? (msg =
-            '爆弾に引っかかったので、' +
-            state['player']['one'] +
-            'さんの負けになります。')
-        : (msg =
-            '爆弾に引っかかったので、' +
-            state['player']['two'] +
-            'さんの負けになります。')
-      : (msg = '対戦相手が爆弾に引っかかったので、あなたの勝利です。')
-    res.json({
-      msg: msg,
-      map: state['client']
-    })
-  } else {
-    final_flg = true
-    const part =
-      '  ' +
-      state['player']['one'] +
-      'さん：' +
-      state['score']['one'] +
-      '点\n  ' +
-      state['player']['two'] +
-      'さん：' +
-      state['score']['two'] +
-      '点'
-    if (state['score']['one'] === state['score']['two']) {
-      res.json({ msg: 'この勝負は引き分けになります。\n' + part })
-    } else if (state['score']['one'] > state['score']['two']) {
-      res.json({ msg: state['player']['one'] + 'さんの勝利です。\n' + part })
-    } else {
-      res.json({ msg: state['player']['two'] + 'さんの勝利です。\n' + part })
-    }
-  }
+  res.json({ flg: final_flg, map: state['client'] })
 })
 
 // 所定の箇所の周囲を判定し、開いていく関数

@@ -8,7 +8,7 @@
       <div
         id="modal-content-innar"
       >
-        <p>{{ final_msg }}</p>
+        <p style="white-space: pre-wrap;">{{ final_msg }}</p>
         <button
           id="next_play"
           @click="next"
@@ -50,9 +50,6 @@ export default {
     modal_content.style.left = (w - cw) / 2 + 'px'
     modal_content.style.top = +((h - ch) / 3) + 'px'
   },
-  updated: function() {
-    console.log(this.visible, this.msg)
-  },
   methods: {
     final: function() {
       if (this.final_msg) {
@@ -90,9 +87,9 @@ export default {
         // サーバーからの応答内容を処理
         xhr.onreadystatechange = () => {
           if (xhr.readyState === 4 && xhr.status === 200) {
-            next_flg = true
+            this.next_flg = true
           } else {
-            next_flg = false
+            this.next_flg = false
           }
         }
       }
