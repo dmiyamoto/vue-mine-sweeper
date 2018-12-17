@@ -196,10 +196,7 @@ export default {
                     }
                   }
                 } else {
-                  // 試合終了のメッセージ表示
-                  if (this.final_flg === false) {
-                    this.final_flg = true //試合終了フラグをONにする
-                  }
+                  if (this.final_flg === false) this.final_flg = true //試合終了フラグをONにする
                 }
               }
             }
@@ -228,7 +225,6 @@ export default {
                     xhr.onreadystatechange = () => {
                       if (xhr.readyState === 4 && xhr.status === 200) {
                         const tmp = JSON.parse(xhr.responseText)
-                        // init(); //初期化処理を実施する
                         this.final_flg = false
                         document.getElementById(
                           'competition_start'
@@ -308,9 +304,8 @@ export default {
                   if (tmpResponse['msg'].length > 0 && msg_roomA.length < 2) {
                     for (let t = 0; t < tmpResponse['msg'].length; t++) {
                       if (msg_roomA.length !== 0) {
-                        msg_roomA[0] !== tmpResponse['msg'][t]
-                          ? msg_roomA.push(tmpResponse['msg'][t])
-                          : ''
+                        if (msg_roomA[0] !== tmpResponse['msg'][t])
+                          msg_roomA.push(tmpResponse['msg'][t])
                         if (msg_roomA[0] !== tmpResponse['msg'][t]) {
                           let content = msg_roomA[0]
                           for (let s = 1; s < msg_roomA.length; s++) {
@@ -444,11 +439,9 @@ export default {
 
       // サーバーからの応答内容を処理
       xhr.onreadystatechange = () => {
-        if (xhr.readyState === 4 && xhr.status === 200) {
-          JSON.parse(xhr.responseText) !== ''
-            ? alert(JSON.parse(xhr.responseText))
-            : ''
-        }
+        if (xhr.readyState === 4 && xhr.status === 200)
+          if (JSON.parse(xhr.responseText) !== '')
+            alert(JSON.parse(xhr.responseText))
       }
     }
   }

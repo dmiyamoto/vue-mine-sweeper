@@ -139,8 +139,9 @@ app.get('/restart', function(req, res) {
   let reFlag = { flg: false, name: '' }
   switch (room['opval']) {
     case 'roomA':
-      for(let i = 0; i < roomA.length; i += 1){
-        if(roomA[i]['id'] === room['id']) reFlag = { flg: true, name: roomA[idx]['player'] }
+      for (let i = 0; i < roomA.length; i += 1) {
+        if (roomA[i]['id'] === room['id'])
+          reFlag = { flg: true, name: roomA[idx]['player'] }
       }
 
       reFlag['flg']
@@ -280,7 +281,7 @@ app.get('/exit', function(req, res) {
   exit_flg = true
 
   for (let s = 0; s < roomA.length; s++) {
-    roomA[s]['id'] === exitData['id'] ? roomA.splice(s, 1) : ''
+    if (roomA[s]['id'] === exitData['id']) roomA.splice(s, 1)
   }
 
   msg = ''
@@ -316,7 +317,7 @@ app.get('/status', function(req, res) {
     )
   }
   msg = data
-  play_flg ? (msg = '試合が開始しましたので、よろしくお願いします。') : ''
+  if (play_flg) msg = '試合が開始しましたので、よろしくお願いします。'
   res.set('Access-Control-Allow-Origin', process.env.ALLOW_ORIGIN)
   res.json({ msg: msg, flg: play_flg })
 })
@@ -326,10 +327,10 @@ app.get('/set', function(req, res) {
   let cnt = 0 // 開いているブロック数の合計
 
   // 現在開いているマスの数を計測
-  if(play_flg){
-    for(let i = 0; i < ROWS; i += 1){
-      for(let s = 0; s < COLS; s += 1){
-        cnt = cnt + (state['map'][i][s]['opened'] ? 1 : 0);
+  if (play_flg) {
+    for (let i = 0; i < ROWS; i += 1) {
+      for (let s = 0; s < COLS; s += 1) {
+        cnt = cnt + (state['map'][i][s]['opened'] ? 1 : 0)
       }
     }
   }
@@ -365,107 +366,61 @@ app.get('/set', function(req, res) {
           tmp2Y < ROWS &&
           state['map'][tmp2Y][tmp2X] !== 0
         ) {
-          state['map'][tmp2Y][tmp2X]['hasBom']
-            ? (counter = counter + 1)
-            : (counter = counter + 0)
+          counter = counter + state['map'][tmp2Y][tmp2X]['hasBom'] ? 1 : 0
         }
       }
 
       if (state['player']['oneID'] === data['id']) {
         if (data['flg']) {
           // 該当箇所を開き、対象プレーヤーから得点を減算する(間違った箇所にフラグを立てているため)
-          counter !== 0
-            ? (state['map'][calcY][calcX] = {
-                opened: true,
-                hasBom: false,
-                numBom: counter,
-                hasFlag: true
-              })
-            : (state['map'][calcY][calcX] = {
-                opened: true,
-                hasBom: false,
-                numBom: '',
-                hasFlag: true
-              })
-          counter !== 0
-            ? (state['client'][calcY][calcX] = { opened: true, hasFlag: true })
-            : (state['client'][calcY][calcX] = { opened: true, hasFlag: true })
+          state['map'][calcY][calcX] = {
+            opened: true,
+            hasBom: false,
+            numBom: counter !== 0 ? counter : '',
+            hasFlag: true
+          }
+          state['client'][calcY][calcX] = { opened: true, hasFlag: true }
           state['score']['one'] = state['score']['one'] - 1
         } else {
           // 該当箇所を開き、対象プレーヤーに得点を加算し、周囲のマスを開く
-          counter !== 0
-            ? (state['map'][calcY][calcX] = {
-                opened: true,
-                hasBom: false,
-                numBom: counter,
-                hasFlag: false
-              })
-            : (state['map'][calcY][calcX] = {
-                opened: true,
-                hasBom: false,
-                numBom: '',
-                hasFlag: false
-              })
-          counter !== 0
-            ? (state['client'][calcY][calcX] = {
-                opened: true,
-                numBom: counter,
-                hasFlag: false
-              })
-            : (state['client'][calcY][calcX] = {
-                opened: true,
-                numBom: '',
-                hasFlag: false
-              })
+          state['map'][calcY][calcX] = {
+            opened: true,
+            hasBom: false,
+            numBom: counter !== 0 ? counter : '',
+            hasFlag: false
+          }
+          state['client'][calcY][calcX] = {
+            opened: true,
+            numBom: counter !== 0 ? counter : '',
+            hasFlag: false
+          }
           state['score']['one'] = state['score']['one'] + 1
           judge(calcX, calcY, data['id'])
         }
       } else if (state['player']['twoID'] === data['id']) {
         if (data['flg']) {
           // 該当箇所を開き、対象プレーヤーから得点を減算する(間違った箇所にフラグを立てているため)
-          counter !== 0
-            ? (state['map'][calcY][calcX] = {
-                opened: true,
-                hasBom: false,
-                numBom: counter,
-                hasFlag: true
-              })
-            : (state['map'][calcY][calcX] = {
-                opened: true,
-                hasBom: false,
-                numBom: '',
-                hasFlag: true
-              })
-          counter !== 0
-            ? (state['client'][calcY][calcX] = { opened: true, hasFlag: true })
-            : (state['client'][calcY][calcX] = { opened: true, hasFlag: true })
+          state['map'][calcY][calcX] = {
+            opened: true,
+            hasBom: false,
+            numBom: counter !== 0 ? counter : '',
+            hasFlag: true
+          }
+          state['client'][calcY][calcX] = { opened: true, hasFlag: true }
           state['score']['two'] = state['score']['two'] - 1
         } else {
           // 該当箇所を開き、対象プレーヤーに得点を加算し、周囲のマスを開く
-          counter !== 0
-            ? (state['map'][calcY][calcX] = {
-                opened: true,
-                hasBom: false,
-                numBom: counter,
-                hasFlag: false
-              })
-            : (state['map'][calcY][calcX] = {
-                opened: true,
-                hasBom: false,
-                numBom: '',
-                hasFlag: false
-              })
-          counter !== 0
-            ? (state['client'][calcY][calcX] = {
-                opened: true,
-                numBom: counter,
-                hasFlag: false
-              })
-            : (state['client'][calcY][calcX] = {
-                opened: true,
-                numBom: '',
-                hasFlag: false
-              })
+          state['map'][calcY][calcX] = {
+            opened: true,
+            hasBom: false,
+            numBom: counter !== 0 ? counter : '',
+            hasFlag: false
+          }
+          state['client'][calcY][calcX] = {
+            opened: true,
+            numBom: counter !== 0 ? counter : '',
+            hasFlag: false
+          }
           state['score']['two'] = state['score']['two'] + 1
           judge(calcX, calcY, data['id'])
         }
@@ -551,18 +506,24 @@ app.get('/set', function(req, res) {
         state['score']['two'] = state['score']['two'] + 1
         msg = ''
       } else {
-        if(state['player']['oneID'] === data['id']){
-          if(state['explosion']['player'] === ''){
-            (state['explosion']['player'] = state['player']['oneID'])
-            msg = '爆弾に引っかかったので、' + state['player']['one'] + 'さんの負けになります。'
-          }else{
+        if (state['player']['oneID'] === data['id']) {
+          if (state['explosion']['player'] === '') {
+            state['explosion']['player'] = state['player']['oneID']
+            msg =
+              '爆弾に引っかかったので、' +
+              state['player']['one'] +
+              'さんの負けになります。'
+          } else {
             msg = '対戦相手が爆弾に引っかかったので、あなたの勝利です。'
           }
-        }else{
-          if(state['explosion']['player'] === ''){
-            (state['explosion']['player'] = state['player']['twoID'])
-            msg = '爆弾に引っかかったので、' + state['player']['two'] + 'さんの負けになります。'
-          }else{
+        } else {
+          if (state['explosion']['player'] === '') {
+            state['explosion']['player'] = state['player']['twoID']
+            msg =
+              '爆弾に引っかかったので、' +
+              state['player']['two'] +
+              'さんの負けになります。'
+          } else {
             msg = '対戦相手が爆弾に引っかかったので、あなたの勝利です。'
           }
         }
@@ -591,18 +552,24 @@ app.get('/set', function(req, res) {
       msg = state['player']['two'] + 'さんの勝利です。\n' + part
     }
   } else if (play_flg && final_flg && cnt !== COLS * ROWS) {
-    if(state['player']['oneID'] === data['id']){
-      if(state['explosion']['player'] === ''){
-        (state['explosion']['player'] = state['player']['oneID'])
-        msg = '爆弾に引っかかったので、' + state['player']['one'] + 'さんの負けになります。'
-      }else{
+    if (state['player']['oneID'] === data['id']) {
+      if (state['explosion']['player'] === '') {
+        state['explosion']['player'] = state['player']['oneID']
+        msg =
+          '爆弾に引っかかったので、' +
+          state['player']['one'] +
+          'さんの負けになります。'
+      } else {
         msg = '対戦相手が爆弾に引っかかったので、あなたの勝利です。'
       }
-    }else{
-      if(state['explosion']['player'] === ''){
-        (state['explosion']['player'] = state['player']['twoID'])
-        msg = '爆弾に引っかかったので、' + state['player']['two'] + 'さんの負けになります。'
-      }else{
+    } else {
+      if (state['explosion']['player'] === '') {
+        state['explosion']['player'] = state['player']['twoID']
+        msg =
+          '爆弾に引っかかったので、' +
+          state['player']['two'] +
+          'さんの負けになります。'
+      } else {
         msg = '対戦相手が爆弾に引っかかったので、あなたの勝利です。'
       }
     }
@@ -634,38 +601,22 @@ function judge(calcX, calcY, playerID) {
         let tmp2X = tmpX - directions[g][0]
         let tmp2Y = tmpY - directions[g][1]
         if (tmp2X >= 0 && tmp2X < COLS && tmp2Y >= 0 && tmp2Y < ROWS) {
-          state['map'][tmp2Y][tmp2X]['hasBom']
-            ? (counter = counter + 1)
-            : (counter = counter + 0)
+          counter = counter + state['map'][tmp2Y][tmp2X]['hasBom'] ? 1 : 0
         }
       }
       // 該当箇所を開き、対象プレーヤーに得点を加算
-      if (counter !== 0) {
-        state['map'][tmpY][tmpX] = {
-          opened: true,
-          hasBom: false,
-          numBom: counter,
-          hasFlag: false
-        }
-        state['client'][tmpY][tmpX] = {
-          opened: true,
-          numBom: counter,
-          hasFlag: false
-        }
-      } else {
-        state['map'][tmpY][tmpX] = {
-          opened: true,
-          hasBom: false,
-          numBom: '',
-          hasFlag: false
-        }
-        state['client'][tmpY][tmpX] = {
-          opened: true,
-          numBom: '',
-          hasFlag: false
-        }
-        judge(tmpX, tmpY, playerID) // 再帰処理(周囲に爆弾が無い時だけ連鎖爆発させる)
+      state['map'][tmpY][tmpX] = {
+        opened: true,
+        hasBom: false,
+        numBom: counter !== 0 ? counter : '',
+        hasFlag: false
       }
+      state['client'][tmpY][tmpX] = {
+        opened: true,
+        numBom: counter !== 0 ? counter : '',
+        hasFlag: false
+      }
+      if (counter === 0) judge(tmpX, tmpY, playerID) // 再帰処理(周囲に爆弾が無い時だけ連鎖爆発させる)
       state['player']['oneID'] === playerID
         ? (state['score']['one'] = state['score']['one'] + 1)
         : (state['score']['two'] = state['score']['two'] + 1)

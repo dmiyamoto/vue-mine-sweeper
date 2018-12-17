@@ -51,12 +51,6 @@ export default {
     modal_content.style.top = +((h - ch) / 3) + 'px'
   },
   methods: {
-    final: function() {
-      if (this.final_msg) {
-        console.log(this.final_msg)
-        this.$emit('update:visible', true)
-      }
-    },
     exit: function() {
       if (localStorage.getItem('msweep') !== null) {
         const param = 'id=' + localStorage.getItem
@@ -87,9 +81,9 @@ export default {
         // サーバーからの応答内容を処理
         xhr.onreadystatechange = () => {
           if (xhr.readyState === 4 && xhr.status === 200) {
-            this.next_flg = true
+            this.$emit('next_flg', true)
           } else {
-            this.next_flg = false
+            this.$emit('next_flg', false)
           }
         }
       }
